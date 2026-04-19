@@ -4,6 +4,7 @@ import { BookOpen, Menu, X, ShoppingCart, User, Award } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 // Types
 interface NavLink {
@@ -29,6 +30,7 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [activeLink, setActiveLink] = useState<string>("/");
+  const router = useRouter();
 
   // Handle scroll effect
   useEffect(() => {
@@ -169,22 +171,24 @@ export function Navbar() {
 
               <div className="flex items-center gap-2 ml-4">
                 <button
-                  className="p-2 text-gray-600 hover:text-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 rounded-lg"
+                  onClick={() => router.push("/cart")}
+                  className="p-2 text-gray-600 hover:text-red-600 transition-colors focus:outline-none focus:ring-2 ring-red-500 rounded-lg"
                   aria-label="Shopping cart"
                 >
                   <ShoppingCart className="w-5 h-5" />
                   <span className="sr-only">Cart</span>
                 </button>
 
-                <button
+                {/* <button
                   className="p-2 text-gray-600 hover:text-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 rounded-lg"
                   aria-label="User account"
                 >
                   <User className="w-5 h-5" />
                   <span className="sr-only">Account</span>
-                </button>
+                </button> */}
 
                 <button
+                  onClick={() => router.push("/auth/login")}
                   className="px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg 
                     hover:shadow-lg hover:shadow-red-200 hover:scale-105 transition-all duration-200 
                     focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
@@ -271,15 +275,16 @@ export function Navbar() {
                   <span className="font-medium">Cart</span>
                 </button>
 
-                <button
+                {/* <button
                   className="w-full px-4 py-3 flex items-center justify-center gap-3 text-gray-700 hover:text-red-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 rounded-lg"
                   aria-label="User account"
                 >
                   <User className="w-5 h-5" />
                   <span className="font-medium">Account</span>
-                </button>
+                </button> */}
 
                 <button
+                  onClick={() => router.push("/auth/login")}
                   className="w-full px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg 
                     hover:shadow-lg transition-all duration-200 
                     focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
