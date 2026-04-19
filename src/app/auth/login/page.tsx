@@ -31,6 +31,18 @@ export default function LoginPage() {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
+      if (
+        formData.email === "admin@example.com" &&
+        formData.password === "admin123"
+      ) {
+        localStorage.setItem("auth_token", "demo_token");
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ email: formData.email, name: "Demo User" }),
+        );
+        router.push("/admin/");
+      }
+
       // Demo login (remove this in production)
       if (
         formData.email === "demo@goodtesting.uz" &&
