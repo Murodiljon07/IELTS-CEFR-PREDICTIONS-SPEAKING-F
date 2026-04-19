@@ -1,13 +1,22 @@
-import React, { ReactNode } from "react";
-
+import type { Metadata } from "next";
 import "../css/global.css";
 
-const RootLayout = ({ children }: { children: ReactNode }) => {
-  return (
-    <html>
-      <body>{children}</body>
-    </html>
-  );
+// SEO metadata
+export const metadata: Metadata = {
+  title: "GoodTesting - IELTS Official Test Center",
+  description:
+    "Master English with our comprehensive learning platform designed for IELTS success",
+  keywords: "IELTS, English learning, test preparation, vocabulary, grammar",
 };
 
-export default RootLayout;
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body className="antialiased">{children}</body>
+    </html>
+  );
+}

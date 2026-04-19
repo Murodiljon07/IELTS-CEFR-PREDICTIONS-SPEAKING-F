@@ -10,7 +10,6 @@ const Page = () => {
     <>
       <Hero />
       <Features />
-
       <Categories />
       <Materials />
       <Testimonials />
