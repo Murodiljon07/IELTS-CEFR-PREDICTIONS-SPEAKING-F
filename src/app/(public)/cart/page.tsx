@@ -104,7 +104,6 @@ export default function CartPage() {
     setCartItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  // Open code verification modal for item
   const openCodeModal = (item: CartItem) => {
     setSelectedItem(item);
     setVerificationCode("");
@@ -113,7 +112,6 @@ export default function CartPage() {
     setShowCodeModal(true);
   };
 
-  // Verify 6-digit code
   const verifyCode = () => {
     if (!verificationCode || verificationCode.length !== 6) {
       setCodeError("Please enter a valid 6-digit code");
@@ -123,15 +121,12 @@ export default function CartPage() {
     setIsVerifying(true);
     setCodeError("");
 
-    // Simulate API verification
     setTimeout(() => {
-      // Demo valid codes: 123456, 789012, 654321
       const validCodes = ["123456", "789012", "654321", "111222", "333444"];
 
       if (validCodes.includes(verificationCode)) {
         setCodeSuccess("Code verified successfully! Material activated.");
 
-        // Activate the item
         setCartItems((prev) =>
           prev.map((item) =>
             item.id === selectedItem?.id
@@ -152,13 +147,11 @@ export default function CartPage() {
     }, 1000);
   };
 
-  // Send cart data to Telegram Admin
   const sendToTelegramAdmin = () => {
     if (pendingItems.length === 0) return;
 
     setIsSendingToTelegram(true);
 
-    // Prepare cart items data
     const selectedItems = pendingItems.map((item) => ({
       id: item.id,
       title: item.title,
@@ -169,12 +162,11 @@ export default function CartPage() {
       total: (item.price * item.quantity).toFixed(2),
     }));
 
-    // Prepare message for Telegram
     const message = {
       user: {
         id: "user_" + Date.now(),
-        name: "Demo User", // This would come from auth
-        email: "user@example.com", // This would come from auth
+        name: "Demo User",
+        email: "user@example.com",
       },
       order: {
         id: "ORDER_" + Date.now(),
@@ -187,29 +179,24 @@ export default function CartPage() {
       },
     };
 
-    // In production, this would be an API call to your backend
-    // which would then forward to Telegram bot
     console.log("📤 Sending to Telegram Admin:", message);
 
-    // Simulate API call
     setTimeout(() => {
-      // Generate a unique order ID and 6-digit code for each item
       const generatedCodes = pendingItems.map((item) => ({
         id: item.id,
         code: Math.floor(100000 + Math.random() * 900000).toString(),
       }));
 
       alert(
-        `✅ Chek Telegram adminga yuborildi!\n\n` +
-          `📦 Buyurtma ID: ${message.order.id}\n` +
-          `💰 Umumiy summa: $${total}\n` +
-          `📦 Mahsulotlar: ${pendingItems.length} ta\n\n` +
-          `👨‍💼 Admin tez orada siz bilan bog'lanadi.\n` +
-          `To'lovni tasdiqlagandan so'ng, har bir material uchun alohida 6 xonali kod yuboriladi.\n\n` +
+        `✅ Order sent to Telegram Admin!\n\n` +
+          `📦 Order ID: ${message.order.id}\n` +
+          `💰 Total Amount: $${total}\n` +
+          `📦 Items: ${pendingItems.length} items\n\n` +
+          `👨‍💼 Admin will contact you shortly.\n` +
+          `After payment confirmation, you will receive a 6-digit code for each material.\n\n` +
           `💬 Telegram: @GoodTestingAdmin`,
       );
 
-      // Here you would save the generated codes to backend
       console.log("Generated codes:", generatedCodes);
 
       setIsSendingToTelegram(false);
@@ -584,14 +571,14 @@ export default function CartPage() {
 
                   <div className="space-y-2">
                     <p className="text-sm text-gray-700">
-                      1. Sizning buyurtma ma'lumotlari adminga yuboriladi
+                      1. Your order details will be sent to the admin
                     </p>
                     <p className="text-sm text-gray-700">
-                      2. Admin siz bilan Telegram orqali bog'lanadi
+                      2. Admin will contact you via Telegram
                     </p>
                     <p className="text-sm text-gray-700">
-                      3. To'lovni amalga oshirganingizdan so'ng, har bir
-                      material uchun alohida 6 xonali kod olasiz
+                      3. After payment, you will receive a 6-digit code for each
+                      material
                     </p>
                   </div>
                 </div>
@@ -635,8 +622,7 @@ export default function CartPage() {
               </div>
 
               <p className="text-center text-xs text-gray-400 mt-4">
-                Admin sizning buyurtmangizni ko'rib chiqadi va tez orada
-                bog'lanadi
+                Admin will review your order and contact you shortly
               </p>
             </div>
           </div>
