@@ -1,13 +1,17 @@
-import React, { ReactNode } from "react";
+import { AuthProvider } from "@/context/AuthContext";
 
 import "./global.css";
 
-const RootLayout = ({ children }: { children: ReactNode }) => {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html>
-      <body>{children}</body>
+    <html lang="en">
+      <body>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
-};
-
-export default RootLayout;
+}
