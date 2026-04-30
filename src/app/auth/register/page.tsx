@@ -2,7 +2,7 @@
 
 import { useState, FormEvent, useEffect } from "react";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
+import authService from "@/api/services/auth.service";
 import {
   User,
   Mail,
@@ -19,25 +19,22 @@ import {
 } from "lucide-react";
 
 type FormData = {
-  name: string;
+  fullName: string;
   email: string;
   phone: string;
   password: string;
-  confirmPassword: string;
 };
 
 export default function RegisterPage() {
-  const { register } = useAuth();
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [form, setForm] = useState<FormData>({
-    name: "",
+    fullName: "",
     email: "",
     phone: "",
     password: "",
-    confirmPassword: "",
   });
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -50,7 +47,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
 
-    if (form.password !== form.confirmPassword) {
+    if (form.password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
@@ -62,18 +59,17 @@ export default function RegisterPage() {
 
     setLoading(true);
 
-    const res = await register({
-      name: form.name,
-      email: form.email,
-      password: form.password,
-      phone: form.phone,
-    });
+    try {
+      let res = await authService.register(form);
 
-    if (!res.success) {
-      setError(res.error || "Registration failed. Please try again.");
+      let user = res.data;
+
+      console.log(user);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -145,8 +141,10 @@ export default function RegisterPage() {
                     type="text"
                     placeholder="John Doe"
                     className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 bg-gray-50/50 hover:bg-white"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    value={form.fullName}
+                    onChange={(e) =>
+                      setForm({ ...form, fullName: e.target.value })
+                    }
                     disabled={loading}
                     required
                   />
@@ -251,10 +249,7 @@ export default function RegisterPage() {
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="••••••••"
                     className="block w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 bg-gray-50/50 hover:bg-white"
-                    value={form.confirmPassword}
-                    onChange={(e) =>
-                      setForm({ ...form, confirmPassword: e.target.value })
-                    }
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     disabled={loading}
                     required
                   />

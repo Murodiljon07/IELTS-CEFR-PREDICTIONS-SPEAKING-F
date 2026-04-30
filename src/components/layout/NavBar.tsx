@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { BookOpen, Menu, X, ShoppingCart } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { BookOpen, Menu, X, User } from "lucide-react";
 
 const NAV_LINKS = [
   { name: "Home", href: "/" },
@@ -12,9 +12,37 @@ const NAV_LINKS = [
   { name: "About", href: "/about" },
 ];
 
+// Mock auth hook - replace with your actual auth logic
+const useAuth = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Check if user is logged in (from localStorage, context, etc.)
+    const token = localStorage.getItem("auth_token");
+    const userData = localStorage.getItem("user_data");
+
+    if (token && userData) {
+      setIsAuthenticated(true);
+      setUser(JSON.parse(userData));
+    }
+  }, []);
+
+  return { isAuthenticated, user };
+};
+
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { isAuthenticated, user } = useAuth();
+
+  const handleLogout = () => {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("user_data");
+    router.push("/");
+    window.location.reload();
+  };
 
   return (
     <>
@@ -49,14 +77,29 @@ export function Navbar() {
                   </Link>
                 );
               })}
-              <Link href="/cart">
-                <ShoppingCart className="w-5 h-5 text-gray-600 hover:text-red-600 cursor-pointer" />
-              </Link>
-              <Link href="/auth/login">
-                <button className="px-5 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                  Get Started
-                </button>
-              </Link>
+
+              {isAuthenticated ? (
+                <div className="flex items-center gap-3">
+                  <Link href="/portfolio">
+                    <button className="flex items-center gap-2 px-4 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                      <User className="w-4 h-4" />
+                      <span>Portfolio</span>
+                    </button>
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-1.5 border border-red-600 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-colors"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <Link href="/auth/login">
+                  <button className="px-5 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    Get Started
+                  </button>
+                </Link>
+              )}
             </div>
 
             {/* Mobile button */}
@@ -86,25 +129,31 @@ export function Navbar() {
                 </Link>
               );
             })}
-            <Link
-              href="/cart"
-              className="block text-gray-700 hover:text-red-600"
-              onClick={() => setIsOpen(false)}
-            >
-              Cart
-            </Link>
-            <Link
-              href="/auth/login"
-              className="block text-gray-700 hover:text-red-600"
-              onClick={() => setIsOpen(false)}
-            >
-              Sign In
-            </Link>
-            <Link href="/auth/register" onClick={() => setIsOpen(false)}>
-              <button className="w-full mt-2 px-5 py-2 bg-red-600 text-white rounded-lg">
-                Get Started
-              </button>
-            </Link>
+
+            {isAuthenticated ? (
+              <div className="pt-2 space-y-2">
+                <Link href="/portfolio" onClick={() => setIsOpen(false)}>
+                  <button className="w-full px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    Portfolio
+                  </button>
+                </Link>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsOpen(false);
+                  }}
+                  className="w-full px-5 py-2 border border-red-600 text-red-600 rounded-lg hover:bg-red-600 hover:text-white"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link href="/auth/login" onClick={() => setIsOpen(false)}>
+                <button className="w-full px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                  Get Started
+                </button>
+              </Link>
+            )}
           </div>
         )}
       </nav>

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import authService from "@/api/services/auth.service";
 import {
   Mail,
   Lock,
@@ -16,7 +17,7 @@ import {
 } from "lucide-react";
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -35,15 +36,23 @@ export default function LoginPage() {
     setError("");
     setIsLoading(true);
 
-    const result = await login(formData);
+    try {
+      let res = await authService.login(formData);
 
-    if (!result.success) {
-      setError(
-        result.error || "An error occurred during login. Please try again.",
-      );
+      let user = res.user;
+
+      console.log(user);
+
+      if (user.role === "user") {
+        router.push("/");
+      } else if (user.role === "admin") {
+        router.push("/admin");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
