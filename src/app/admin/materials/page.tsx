@@ -13,119 +13,105 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-interface Material {
-  id: number;
-  title: string;
-  category: string;
-  level: "Beginner" | "Intermediate" | "Advanced";
-  price: number;
-  originalPrice?: number;
-  type: "course" | "material";
-  status: "active" | "inactive";
-  createdAt: string;
-  downloads: number;
-  rating: number;
-}
+import { useEffect } from "react";
+import { Material } from "@/types/Material.type";
+import { materialService } from "@/api/services/materials.service";
 
-const mockMaterials: Material[] = [
-  {
-    id: 1,
-    title: "IELTS Vocabulary Builder",
-    category: "Vocabulary",
-    level: "Intermediate",
-    price: 29.99,
-    type: "material",
-    status: "active",
-    createdAt: "2024-01-10",
-    downloads: 2340,
-    rating: 4.8,
-  },
-  {
-    id: 2,
-    title: "Grammar Fundamentals",
-    category: "Grammar",
-    level: "Beginner",
-    price: 0,
-    type: "material",
-    status: "active",
-    createdAt: "2024-01-08",
-    downloads: 3120,
-    rating: 4.9,
-  },
-  {
-    id: 3,
-    title: "Complete IELTS Course",
-    category: "IELTS",
-    level: "Intermediate",
-    price: 299,
-    originalPrice: 499,
-    type: "course",
-    status: "active",
-    createdAt: "2024-01-05",
-    downloads: 12500,
-    rating: 4.9,
-  },
-  {
-    id: 4,
-    title: "Advanced Reading",
-    category: "Reading",
-    level: "Advanced",
-    price: 34.99,
-    type: "material",
-    status: "inactive",
-    createdAt: "2024-01-03",
-    downloads: 1890,
-    rating: 4.7,
-  },
-];
-
+// Categories - Material type dagi category larga mos
 const categories = [
   "All",
   "IELTS",
-  "Grammar",
-  "Vocabulary",
-  "Reading",
-  "Listening",
-  "Writing",
-  "Speaking",
+  "grammar",
+  "vocabulary",
+  "reading",
+  "listening",
+  "writing",
+  "speaking",
 ];
-const levels = ["All", "Beginner", "Intermediate", "Advanced"];
+
+const levels = ["All", "beginner", "intermediate", "advanced"];
+
+// Level colors - type dagi qiymatlarga mos
+const levelColors = {
+  beginner: "bg-green-100 text-green-700",
+  intermediate: "bg-blue-100 text-blue-700",
+  advanced: "bg-red-100 text-red-700",
+};
+
+// Category ni formatlash
+const formatCategory = (category: string) => {
+  const map: Record<string, string> = {
+    ielts: "IELTS",
+    grammar: "Grammar",
+    vocabulary: "Vocabulary",
+    reading: "Reading",
+    listening: "Listening",
+    writing: "Writing",
+    speaking: "Speaking",
+  };
+  return map[category.toLowerCase()] || category;
+};
 
 export default function AdminMaterials() {
-  const [materials, setMaterials] = useState<Material[]>(mockMaterials);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedLevel, setSelectedLevel] = useState("All");
-  const [showDeleteModal, setShowDeleteModal] = useState<number | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState<string | null>(null); // _id uchun string
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    async function getAllMaterials() {
+      try {
+        setIsLoading(true);
+        let data = await materialService.getAllMaterials();
+        // Backenddan kelgan ma'lumotlar strukturasi tekshirish
+        setMaterials(data.materials || data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    getAllMaterials();
+  }, []);
 
   const filteredMaterials = materials.filter((m) => {
-    const matchesSearch = m.title.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = m.name.toLowerCase().includes(search.toLowerCase());
     const matchesCategory =
       selectedCategory === "All" || m.category === selectedCategory;
     const matchesLevel = selectedLevel === "All" || m.level === selectedLevel;
     return matchesSearch && matchesCategory && matchesLevel;
   });
 
-  const handleDelete = (id: number) => {
-    setMaterials((prev) => prev.filter((m) => m.id !== id));
-    setShowDeleteModal(null);
+  const handleDelete = async (id: string) => {
+    try {
+      // Agar backendda delete API bo'lsa
+      // await materialService.deleteMaterial(id);
+
+      // Frontenddan o'chirish
+      setMaterials((prev) =>
+        prev.filter((m) => (m as any)._id !== id && (m as any).id !== id),
+      );
+      setShowDeleteModal(null);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleToggleStatus = (id: number) => {
-    setMaterials((prev) =>
-      prev.map((m) =>
-        m.id === id
-          ? { ...m, status: m.status === "active" ? "inactive" : "active" }
-          : m,
-      ),
+  // Material ID ni olish (MongoDB _id yoki oddiy id)
+  const getMaterialId = (material: Material): string => {
+    return (material as any)._id || (material as any).id || String(Date.now());
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+      </div>
     );
-  };
-
-  const levelColors = {
-    Beginner: "bg-green-100 text-green-700",
-    Intermediate: "bg-blue-100 text-blue-700",
-    Advanced: "bg-red-100 text-red-700",
-  };
+  }
 
   return (
     <div>
@@ -186,10 +172,10 @@ export default function AdminMaterials() {
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
                 <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                  ID
+                  #
                 </th>
                 <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                  Title
+                  Name
                 </th>
                 <th className="text-left p-4 text-sm font-semibold text-gray-600">
                   Category
@@ -201,10 +187,10 @@ export default function AdminMaterials() {
                   Price
                 </th>
                 <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                  Status
+                  Rating
                 </th>
                 <th className="text-left p-4 text-sm font-semibold text-gray-600">
-                  Downloads
+                  Created At
                 </th>
                 <th className="text-left p-4 text-sm font-semibold text-gray-600">
                   Actions
@@ -212,72 +198,77 @@ export default function AdminMaterials() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredMaterials.map((material) => (
-                <tr key={material.id} className="hover:bg-gray-50 transition">
-                  <td className="p-4 text-sm text-gray-600">#{material.id}</td>
+              {filteredMaterials.map((material, index) => (
+                <tr
+                  key={getMaterialId(material)}
+                  className="hover:bg-gray-50 transition"
+                >
+                  <td className="p-4 text-sm text-gray-600">{index + 1}</td>
                   <td className="p-4">
                     <div>
                       <p className="font-medium text-gray-900">
-                        {material.title}
+                        {material.name}
                       </p>
-                      <p className="text-xs text-gray-500">{material.type}</p>
+                      {material.file && (
+                        <p className="text-xs text-gray-500 mt-1 truncate max-w-[200px]">
+                          {material.file}
+                        </p>
+                      )}
                     </div>
                   </td>
                   <td className="p-4 text-sm text-gray-600">
-                    {material.category}
+                    {formatCategory(material.category)}
                   </td>
                   <td className="p-4">
                     <span
                       className={`text-xs px-2 py-1 rounded-full ${levelColors[material.level]}`}
                     >
-                      {material.level}
+                      {material.level.charAt(0).toUpperCase() +
+                        material.level.slice(1)}
                     </span>
                   </td>
                   <td className="p-4">
-                    {material.price === 0 ? (
+                    {Number(material.salary) === 0 ? (
                       <span className="text-green-600 font-medium">Free</span>
                     ) : (
-                      <div>
-                        <span className="font-medium text-gray-900">
-                          ${material.price}
-                        </span>
-                        {material.originalPrice && (
-                          <span className="text-xs text-gray-400 line-through ml-1">
-                            ${material.originalPrice}
-                          </span>
-                        )}
-                      </div>
+                      <span className="font-medium text-gray-900">
+                        ${Number(material.salary).toFixed(2)}
+                      </span>
                     )}
                   </td>
                   <td className="p-4">
-                    <button
-                      onClick={() => handleToggleStatus(material.id)}
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        material.status === "active"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-gray-100 text-gray-500"
-                      }`}
-                    >
-                      {material.status}
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <span className="text-amber-500">★</span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {Number(material.rate).toFixed(1)}
+                      </span>
+                    </div>
                   </td>
                   <td className="p-4 text-sm text-gray-600">
-                    {material.downloads.toLocaleString()}
+                    {material.createdAt
+                      ? new Date(material.createdAt).toLocaleDateString()
+                      : "-"}
                   </td>
                   <td className="p-4">
                     <div className="flex items-center gap-2">
-                      <Link href={`/admin/materials/${material.id}`}>
+                      <Link
+                        href={`/admin/materials/${getMaterialId(material)}`}
+                      >
                         <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition">
                           <Eye className="w-4 h-4" />
                         </button>
                       </Link>
-                      <Link href={`/admin/materials/${material.id}/edit`}>
+                      <Link
+                        href={`/admin/materials/${getMaterialId(material)}/edit`}
+                      >
                         <button className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition">
                           <Edit className="w-4 h-4" />
                         </button>
                       </Link>
                       <button
-                        onClick={() => setShowDeleteModal(material.id)}
+                        onClick={() =>
+                          setShowDeleteModal(getMaterialId(material))
+                        }
                         className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -289,6 +280,13 @@ export default function AdminMaterials() {
             </tbody>
           </table>
         </div>
+
+        {/* Empty state */}
+        {filteredMaterials.length === 0 && !isLoading && (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No materials found</p>
+          </div>
+        )}
       </div>
 
       {/* Delete Confirmation Modal */}
@@ -305,13 +303,13 @@ export default function AdminMaterials() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteModal(null)}
-                className="flex-1 px-4 py-2 border rounded-lg text-gray-700"
+                className="flex-1 px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDelete(showDeleteModal)}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg"
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
               >
                 Delete
               </button>

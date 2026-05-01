@@ -17,6 +17,7 @@ import {
   CheckCircle,
   Phone,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type FormData = {
   fullName: string;
@@ -26,6 +27,7 @@ type FormData = {
 };
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [form, setForm] = useState<FormData>({
@@ -64,7 +66,13 @@ export default function RegisterPage() {
 
       let user = res.data;
 
-      console.log(user);
+      if (user.role === "user") {
+        router.push("/");
+      } else if (user.role === "admin") {
+        router.push("/admin");
+      }
+
+      localStorage.setItem("token", res.token);
     } catch (error) {
       console.log(error);
     } finally {

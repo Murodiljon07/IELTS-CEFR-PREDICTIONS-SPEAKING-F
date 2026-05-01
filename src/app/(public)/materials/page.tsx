@@ -1,7 +1,8 @@
+// app/materials/page.tsx
 "use client";
 
 import { Material } from "@/types/Material.type";
-
+import { materialService } from "@/api/services/materials.service";
 import MaterialCard from "@/components/ui/materialCard";
 
 import { useState, useEffect } from "react";
@@ -16,117 +17,39 @@ import {
   ChevronDown,
 } from "lucide-react";
 
-// Mock data
-const materialsData: Material[] = [
-  {
-    id: 1,
-    title: "IELTS Vocabulary Builder",
-    level: "Intermediate",
-    category: "Vocabulary",
-    rating: 4.8,
-    downloads: 2340,
-    price: 29.99,
-    isPopular: true,
-  },
-  {
-    id: 2,
-    title: "Grammar Fundamentals",
-    level: "Beginner",
-    category: "Grammar",
-    rating: 4.9,
-    downloads: 3120,
-    price: 0,
-    isFree: true,
-    isNew: true,
-  },
-  {
-    id: 3,
-    title: "Advanced Reading Strategies",
-    level: "Advanced",
-    category: "Reading",
-    rating: 4.7,
-    downloads: 1890,
-    price: 34.99,
-    isPopular: true,
-  },
-  {
-    id: 4,
-    title: "Listening Practice Tests",
-    level: "Intermediate",
-    category: "Listening",
-    rating: 4.6,
-    downloads: 2560,
-    price: 24.99,
-  },
-  {
-    id: 5,
-    title: "Writing Task 2 Mastery",
-    level: "Advanced",
-    category: "Writing",
-    rating: 4.9,
-    downloads: 2100,
-    price: 39.99,
-    isNew: true,
-  },
-  {
-    id: 6,
-    title: "Speaking Confidence Kit",
-    level: "Beginner",
-    category: "Speaking",
-    rating: 4.8,
-    downloads: 1750,
-    price: 0,
-    isFree: true,
-  },
-  {
-    id: 7,
-    title: "IELTS Full Mock Tests",
-    level: "Advanced",
-    category: "IELTS",
-    rating: 4.9,
-    downloads: 4200,
-    price: 49.99,
-    isPopular: true,
-  },
-  {
-    id: 8,
-    title: "Business English Essentials",
-    level: "Intermediate",
-    category: "Business",
-    rating: 4.7,
-    downloads: 1950,
-    price: 29.99,
-  },
-  {
-    id: 9,
-    title: "Academic Writing Guide",
-    level: "Advanced",
-    category: "Writing",
-    rating: 4.8,
-    downloads: 2300,
-    price: 34.99,
-  },
-];
-
 const categories = [
   "All",
-  "Vocabulary",
+  "IELTS",
   "Grammar",
+  "Vocabulary",
   "Reading",
   "Listening",
   "Writing",
   "Speaking",
-  "IELTS",
-  "Business",
 ];
+
 const levels = ["All", "Beginner", "Intermediate", "Advanced"];
 const ITEMS_PER_PAGE = 6;
 
-// Level badge colors
+// Level badge colors - type dagi qiymatlarga mos
 const levelColors = {
-  Beginner: "bg-green-100 text-green-700",
-  Intermediate: "bg-blue-100 text-blue-700",
-  Advanced: "bg-red-100 text-red-700",
+  beginner: "bg-green-100 text-green-700",
+  intermediate: "bg-blue-100 text-blue-700",
+  advanced: "bg-red-100 text-red-700",
+};
+
+// Category ni formatlash
+const formatCategoryForFilter = (category: string) => {
+  const map: Record<string, string> = {
+    ielts: "IELTS",
+    grammar: "Grammar",
+    vocabulary: "Vocabulary",
+    reading: "Reading",
+    listening: "Listening",
+    writing: "Writing",
+    speaking: "Speaking",
+  };
+  return map[category.toLowerCase()] || category;
 };
 
 export default function MaterialsPage() {
@@ -135,17 +58,43 @@ export default function MaterialsPage() {
   const [selectedLevel, setSelectedLevel] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [materialsData, setMaterialsData] = useState<Material[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Filter materials
+  useEffect(() => {
+    async function getAllMaterials() {
+      try {
+        setIsLoading(true);
+        let data = await materialService.getAllMaterials();
+        setMaterialsData(data.materials);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    getAllMaterials();
+  }, []);
+
+  // Filter materials - type ga mos
   const filteredMaterials = materialsData.filter((material) => {
-    const matchesSearch = material.title
+    const matchesSearch = material.name
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
+
+    const materialCategoryFormatted = formatCategoryForFilter(
+      material.category,
+    );
     const matchesCategory =
-      selectedCategory === "All" || material.category === selectedCategory;
+      selectedCategory === "All" ||
+      materialCategoryFormatted === selectedCategory;
+
+    const materialLevelFormatted =
+      material.level.charAt(0).toUpperCase() + material.level.slice(1);
     const matchesLevel =
-      selectedLevel === "All" || material.level === selectedLevel;
+      selectedLevel === "All" || materialLevelFormatted === selectedLevel;
+
     return matchesSearch && matchesCategory && matchesLevel;
   });
 
@@ -316,8 +265,13 @@ export default function MaterialsPage() {
             </p>
           </div>
 
-          {/* Materials Grid */}
-          {filteredMaterials.length === 0 ? (
+          {/* Loading State */}
+          {isLoading ? (
+            <div className="text-center py-16 bg-white rounded-xl">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
+              <p className="text-gray-500">Loading materials...</p>
+            </div>
+          ) : filteredMaterials.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-xl">
               <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -335,18 +289,14 @@ export default function MaterialsPage() {
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {paginatedMaterials.map((material) => (
-                <MaterialCard
-                  key={material.id}
-                  material={material}
-                  levelColors={levelColors}
-                />
+              {paginatedMaterials.map((material, index) => (
+                <MaterialCard key={index} material={material} />
               ))}
             </div>
           )}
 
           {/* Pagination */}
-          {totalPages > 1 && (
+          {totalPages > 1 && !isLoading && (
             <div className="flex justify-center gap-2 mt-8">
               <button
                 onClick={() => setCurrentPage(currentPage - 1)}

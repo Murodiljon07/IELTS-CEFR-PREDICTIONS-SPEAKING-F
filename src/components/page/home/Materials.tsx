@@ -3,74 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Star, Download, BookOpen, Eye, TrendingUp, Award } from "lucide-react";
-
-// Types
-interface Material {
-  id: number;
-  title: string;
-  level: "Beginner" | "Intermediate" | "Advanced";
-  category: string;
-  rating: number;
-  downloads: number;
-  isFree?: boolean;
-  isPopular?: boolean;
-}
-
-// Mock data
-const materialsData: Material[] = [
-  {
-    id: 1,
-    title: "IELTS Vocabulary Builder",
-    level: "Intermediate",
-    category: "Vocabulary",
-    rating: 4.8,
-    downloads: 2340,
-    isPopular: true,
-  },
-  {
-    id: 2,
-    title: "Grammar Fundamentals",
-    level: "Beginner",
-    category: "Grammar",
-    rating: 4.9,
-    downloads: 3120,
-    isFree: true,
-  },
-  {
-    id: 3,
-    title: "Advanced Reading Strategies",
-    level: "Advanced",
-    category: "Reading",
-    rating: 4.7,
-    downloads: 1890,
-    isPopular: true,
-  },
-  {
-    id: 4,
-    title: "Listening Practice Tests",
-    level: "Intermediate",
-    category: "Listening",
-    rating: 4.6,
-    downloads: 2560,
-  },
-  {
-    id: 5,
-    title: "Writing Task 2 Mastery",
-    level: "Advanced",
-    category: "Writing",
-    rating: 4.9,
-    downloads: 2100,
-  },
-  {
-    id: 6,
-    title: "Speaking Confidence Kit",
-    level: "Beginner",
-    category: "Speaking",
-    rating: 4.8,
-    downloads: 1750,
-    isFree: true,
-  },
-];
+import { materialService } from "@/api/services/materials.service";
+import { Material } from "@/types/Material.type";
 
 // Level badge colors
 const levelColors = {
@@ -81,6 +15,24 @@ const levelColors = {
 
 export function Materials() {
   const [isVisible, setIsVisible] = useState(false);
+  const [materialsData, setMaterialsData] = useState<Material[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function getAllMaterials() {
+      try {
+        setIsLoading(true);
+        let data = await materialService.getAllMaterials();
+        setMaterialsData(data.materials);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    getAllMaterials();
+  }, []);
 
   useEffect(() => {
     setIsVisible(true);
@@ -109,7 +61,6 @@ export function Materials() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {materialsData.map((material, index) => (
             <div
-              key={material.id}
               className={`bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1 ${
                 isVisible
                   ? "opacity-100 translate-y-0"
@@ -122,12 +73,12 @@ export function Materials() {
                 <BookOpen className="w-12 h-12 text-gray-300" />
 
                 {/* Badges */}
-                {material.isFree && (
+                {material.salary === 0 && (
                   <span className="absolute top-3 left-3 px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-lg">
                     FREE
                   </span>
                 )}
-                {material.isPopular && (
+                {Number(material.rate) > 4.5 && (
                   <span className="absolute top-3 right-3 px-2 py-1 bg-amber-500 text-white text-xs font-bold rounded-lg flex items-center gap-1">
                     <TrendingUp className="w-3 h-3" />
                     POPULAR
@@ -151,7 +102,7 @@ export function Materials() {
 
                 {/* Title */}
                 <h3 className="font-bold text-gray-900 text-lg mb-2 line-clamp-1">
-                  {material.title}
+                  {material.name}
                 </h3>
 
                 {/* Rating and Downloads */}
@@ -159,15 +110,12 @@ export function Materials() {
                   <div className="flex items-center gap-1">
                     <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
                     <span className="text-sm font-semibold text-gray-900">
-                      {material.rating}
+                      {material.rate.toLocaleString()}
                     </span>
                     <span className="text-xs text-gray-400">(128 reviews)</span>
                   </div>
                   <div className="flex items-center gap-1 text-gray-500">
                     <Download className="w-3.5 h-3.5" />
-                    <span className="text-xs">
-                      {material.downloads.toLocaleString()}
-                    </span>
                   </div>
                 </div>
 

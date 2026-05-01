@@ -41,7 +41,7 @@ export default function LoginPage() {
 
       let user = res.user;
 
-      console.log(user);
+      localStorage.setItem("token", res.token);
 
       if (user.role === "user") {
         router.push("/");

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useEffect } from "react";
+import { materialService } from "@/api/services/materials.service";
 import {
   Key,
   Copy,
@@ -10,36 +12,7 @@ import {
   Calendar,
 } from "lucide-react";
 
-interface Material {
-  id: number;
-  title: string;
-  price: number;
-  category: string;
-}
-
-const availableMaterials: Material[] = [
-  {
-    id: 1,
-    title: "IELTS Vocabulary Builder",
-    price: 29.99,
-    category: "Vocabulary",
-  },
-  { id: 2, title: "Grammar Fundamentals", price: 0, category: "Grammar" },
-  { id: 3, title: "Complete IELTS Course", price: 299, category: "IELTS" },
-  {
-    id: 4,
-    title: "Advanced Reading Strategies",
-    price: 34.99,
-    category: "Reading",
-  },
-  { id: 5, title: "Writing Task 2 Mastery", price: 99, category: "Writing" },
-  {
-    id: 6,
-    title: "Speaking Confidence Kit",
-    price: 49.99,
-    category: "Speaking",
-  },
-];
+import { Material } from "@/types/Material.type";
 
 interface GeneratedCode {
   id: string;
@@ -57,10 +30,33 @@ export default function GenerateCodesPage() {
   const [generatedCodes, setGeneratedCodes] = useState<GeneratedCode[]>([]);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
+  const [availableMaterials, setAvailableMaterials] = useState<Material[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    async function getAllMaterials() {
+      try {
+        setIsLoading(true);
+        let data = await materialService.getAllMaterials();
+        // Backenddan kelgan ma'lumotlar strukturasi tekshirish
+        setAvailableMaterials(data.materials || data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    getAllMaterials();
+  }, []);
+
   const selectedMaterials = availableMaterials.filter((m) =>
-    selectedMaterialIds.includes(m.id),
+    selectedMaterialIds.includes(Number(m.id)),
   );
-  const totalPrice = selectedMaterials.reduce((sum, m) => sum + m.price, 0);
+  const totalPrice = selectedMaterials.reduce(
+    (sum, m) => sum + Number(m.salary),
+    0,
+  );
 
   const toggleMaterial = (id: number) => {
     setSelectedMaterialIds((prev) =>
@@ -92,7 +88,7 @@ export default function GenerateCodesPage() {
 
     // Show summary alert
     alert(
-      `✅ ${quantity} code(s) generated successfully!\n\nTotal Amount: $${(totalPrice * quantity).toFixed(2)}\nMaterials: ${selectedMaterials.map((m) => m.title).join(", ")}`,
+      `✅ ${quantity} code(s) generated successfully!\n\nTotal Amount: $${(totalPrice * quantity).toFixed(2)}\nMaterials: ${selectedMaterials.map((m) => m.name).join(", ")}`,
     );
   };
 
@@ -130,8 +126,8 @@ export default function GenerateCodesPage() {
                 >
                   <input
                     type="checkbox"
-                    checked={selectedMaterialIds.includes(material.id)}
-                    onChange={() => toggleMaterial(material.id)}
+                    checked={selectedMaterialIds.includes(Number(material.id))}
+                    onChange={() => toggleMaterial(Number(material.id))}
                     className="w-4 h-4 text-red-600 rounded"
                   />
                   <div className="flex-1">
@@ -140,7 +136,7 @@ export default function GenerateCodesPage() {
                         {material.title}
                       </span>
                       <span className="font-semibold text-gray-900">
-                        {material.price === 0 ? "Free" : `$${material.price}`}
+                        {material.salary === 0 ? "Free" : `$${material.price}`}
                       </span>
                     </div>
                     <p className="text-xs text-gray-500">{material.category}</p>
