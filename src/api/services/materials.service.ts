@@ -7,11 +7,10 @@ export const materialService = {
     return res.data;
   },
 
-  createMaterial: async (token: string | null, data: FormData) => {
+  createMaterial: async (token: string, data: FormData) => {
     let res = await api.post("/materials/create-material", data, {
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
       },
     });
     return res.data;
@@ -22,7 +21,6 @@ export const materialService = {
     let res = await api.put(`/materials/${id}`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
       },
     });
     return res.data;

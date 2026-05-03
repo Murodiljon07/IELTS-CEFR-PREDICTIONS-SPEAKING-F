@@ -8,9 +8,9 @@ import { Material } from "@/types/Material.type";
 
 // Level badge colors
 const levelColors = {
-  Beginner: "bg-green-100 text-green-700",
-  Intermediate: "bg-blue-100 text-blue-700",
-  Advanced: "bg-red-100 text-red-700",
+  beginner: "bg-green-100 text-green-700",
+  intermediate: "bg-blue-100 text-blue-700",
+  advanced: "bg-red-100 text-red-700",
 };
 
 export function Materials() {
@@ -61,6 +61,7 @@ export function Materials() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {materialsData.map((material, index) => (
             <div
+              key={material.id}
               className={`bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1 ${
                 isVisible
                   ? "opacity-100 translate-y-0"

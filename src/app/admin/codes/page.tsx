@@ -121,7 +121,7 @@ export default function GenerateCodesPage() {
             <div className="space-y-2 mb-6">
               {availableMaterials.map((material) => (
                 <label
-                  key={material.id}
+                  key={Number(material.id)}
                   className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
                 >
                   <input
@@ -133,10 +133,10 @@ export default function GenerateCodesPage() {
                   <div className="flex-1">
                     <div className="flex justify-between">
                       <span className="font-medium text-gray-900">
-                        {material.title}
+                        {material.name}
                       </span>
                       <span className="font-semibold text-gray-900">
-                        {material.salary === 0 ? "Free" : `$${material.price}`}
+                        {material.salary === 0 ? "Free" : `$${material.salary}`}
                       </span>
                     </div>
                     <p className="text-xs text-gray-500">{material.category}</p>
@@ -153,11 +153,11 @@ export default function GenerateCodesPage() {
                 </p>
                 {selectedMaterials.map((m) => (
                   <div
-                    key={m.id}
+                    key={Number(m.id)}
                     className="text-sm text-blue-800 flex justify-between"
                   >
-                    <span>{m.title}</span>
-                    <span>${m.price}</span>
+                    <span>{m.name}</span>
+                    <span>${Number(m.salary)}</span>
                   </div>
                 ))}
                 <div className="border-t border-blue-200 mt-2 pt-2 flex justify-between font-bold">
@@ -259,8 +259,10 @@ export default function GenerateCodesPage() {
                         <Package className="w-3 h-3" />
                         <span>
                           {availableMaterials
-                            .filter((m) => item.materialIds.includes(m.id))
-                            .map((m) => m.title)
+                            .filter((m) =>
+                              item.materialIds.includes(Number(m.id)),
+                            )
+                            .map((m) => m.name)
                             .join(", ")}
                         </span>
                       </div>

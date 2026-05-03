@@ -52,6 +52,7 @@ const formatCategory = (category: string) => {
   return map[category.toLowerCase()] || category;
 };
 
+const token = localStorage.getItem("token");
 export default function AdminMaterials() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -88,7 +89,7 @@ export default function AdminMaterials() {
   const handleDelete = async (id: string) => {
     try {
       // Agar backendda delete API bo'lsa
-      // await materialService.deleteMaterial(id);
+      await materialService.deleteMaterial(token, id);
 
       // Frontenddan o'chirish
       setMaterials((prev) =>
@@ -102,7 +103,7 @@ export default function AdminMaterials() {
 
   // Material ID ni olish (MongoDB _id yoki oddiy id)
   const getMaterialId = (material: Material): string => {
-    return (material as any)._id || (material as any).id || String(Date.now());
+    return (material as any)._id;
   };
 
   if (isLoading) {

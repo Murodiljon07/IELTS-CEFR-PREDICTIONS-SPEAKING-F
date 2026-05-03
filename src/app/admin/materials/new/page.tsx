@@ -19,8 +19,8 @@ interface MaterialFormData {
   level: "beginner" | "intermediate" | "advanced";
   rate: number;
   salary: number;
-  file?: File | string;
-  banner?: File | string;
+  file?: string;
+  banner?: string;
 }
 
 export default function AddMaterialPage() {
@@ -33,12 +33,11 @@ export default function AddMaterialPage() {
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
 
-
     setToken(storedToken);
 
     // Agar token bo'lmasa, login page ga redirect qilish
     if (!storedToken) {
-      router.push("/admin/login");
+      router.push("/auth/login");
     }
   }, [router]);
 
@@ -46,7 +45,7 @@ export default function AddMaterialPage() {
     name: "",
     category: "IELTS",
     level: "beginner",
-    rate: 0,
+    rate: 0.1,
     salary: 0,
     file: "",
     banner: "",
@@ -60,7 +59,7 @@ export default function AddMaterialPage() {
 
     if (!token) {
       setError("Please login first");
-      router.push("/admin/login");
+      router.push("/auth/login");
       return;
     }
 

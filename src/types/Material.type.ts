@@ -1,6 +1,6 @@
 export interface Material {
-  id: Number;
-  name: String;
+  id: number;
+  name: string;
   level: "beginner" | "intermediate" | "advanced";
 
   category:
@@ -12,10 +12,10 @@ export interface Material {
     | "writing"
     | "speaking";
 
-  file?: String;
+  file?: string;
 
-  banner?: String;
-  rate: Number;
-  salary: Number;
+  banner?: string;
+  rate: number;
+  salary: number;
   createdAt: Date;
 }
