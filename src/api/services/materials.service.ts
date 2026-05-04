@@ -11,6 +11,7 @@ export const materialService = {
     let res = await api.post("/materials/create-material", data, {
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
       },
     });
     return res.data;

@@ -77,14 +77,10 @@ export default function AddMaterialPage() {
 
       if (selectedFile) {
         submitData.append("file", selectedFile);
-      } else {
-        submitData.append("file", "");
       }
 
       if (selectedBanner) {
         submitData.append("banner", selectedBanner);
-      } else {
-        submitData.append("banner", "");
       }
 
       console.log(submitData);

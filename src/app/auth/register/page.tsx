@@ -65,14 +65,14 @@ export default function RegisterPage() {
       let res = await authService.register(form);
 
       let user = res.data;
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("user", user);
 
       if (user.role === "user") {
         router.push("/");
       } else if (user.role === "admin") {
         router.push("/admin");
       }
-
-      localStorage.setItem("token", res.token);
     } catch (error) {
       console.log(error);
     } finally {
