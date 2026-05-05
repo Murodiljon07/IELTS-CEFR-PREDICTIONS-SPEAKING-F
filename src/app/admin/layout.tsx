@@ -34,7 +34,7 @@ export default function AdminLayout({
   const pathname = usePathname();
 
   const handleLogout = () => {
-    localStorage.removeItem("auth_token");
+    localStorage.clear();
     window.location.href = "/auth/login";
   };
 

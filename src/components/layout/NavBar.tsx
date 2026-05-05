@@ -38,7 +38,7 @@ export function Navbar() {
   const { isAuthenticated, user } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem("auth_token");
+    localStorage.removeItem("token");
     localStorage.removeItem("user_data");
     router.push("/");
     window.location.reload();

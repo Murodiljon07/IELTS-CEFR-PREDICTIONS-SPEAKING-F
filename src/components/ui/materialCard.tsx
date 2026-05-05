@@ -29,7 +29,7 @@ const formatCategory = (category: string) => {
 function MaterialCard({ material }: { material: Material }) {
   // MaterialCard da ishlatiladigan qo'shimcha flaglar (agar backenddan kelmasa, logic orqali aniqlaymiz)
   const isFree = material.salary === 0;
-  const isPopular = true; // 4.8 va undan yuqori bo'lsa popular
+  const isPopular = material.rate >= 4.5; // 4.8 va undan yuqori bo'lsa popular
   const isNew =
     new Date(material.createdAt) >
     new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // 7 kun ichida yaratilgan bo'lsa
@@ -53,16 +53,19 @@ function MaterialCard({ material }: { material: Material }) {
             FREE
           </span>
         )}
-        {isPopular && !isFree && (
-          <span className="absolute top-3 right-3 px-2 py-1 bg-amber-500 text-white text-xs font-bold rounded-lg">
-            POPULAR
-          </span>
-        )}
-        {isNew && !isFree && !isPopular && (
-          <span className="absolute top-3 right-3 px-2 py-1 bg-blue-500 text-white text-xs font-bold rounded-lg">
-            NEW
-          </span>
-        )}
+
+        <div className="absolute top-3 right-3 px-2 py-1">
+          {isPopular && (
+            <span className=" px-2 py-1 bg-amber-500 text-white text-xs font-bold rounded-lg">
+              POPULAR
+            </span>
+          )}
+          {isNew && (
+            <span className="px-2 py-1 bg-blue-500 text-white text-xs font-bold rounded-lg">
+              NEW
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Content */}
