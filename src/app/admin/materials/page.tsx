@@ -87,6 +87,8 @@ export default function AdminMaterials() {
   });
 
   const handleDelete = async (id: string) => {
+    console.log(id);
+
     try {
       // Agar backendda delete API bo'lsa
       await materialService.deleteMaterial(token, id);

@@ -19,7 +19,7 @@ export const materialService = {
 
   // Agar kerak bo'lsa update va delete uchun ham
   updateMaterial: async (token: string | null, id: string, data: FormData) => {
-    let res = await api.put(`/materials/${id}`, data, {
+    let res = await api.put(`/${id}`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -28,7 +28,7 @@ export const materialService = {
   },
 
   deleteMaterial: async (token: string | null, id: string) => {
-    let res = await api.delete(`/materials/${id}`, {
+    let res = await api.delete(`/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

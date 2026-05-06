@@ -60,7 +60,7 @@ function MaterialCard({ material }: { material: Material }) {
               POPULAR
             </span>
           )}
-          {isNew && (
+          {isNew && !isPopular && (
             <span className="px-2 py-1 bg-blue-500 text-white text-xs font-bold rounded-lg">
               NEW
             </span>
