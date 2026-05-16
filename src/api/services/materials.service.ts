@@ -7,6 +7,11 @@ export const materialService = {
     return res.data;
   },
 
+  getMaterialById: async (id: number) => {
+    let res = await api.get(`/materials/${id}`);
+    return res.data;
+  },
+
   createMaterial: async (token: string, data: FormData) => {
     let res = await api.post("/materials/create-material", data, {
       headers: {

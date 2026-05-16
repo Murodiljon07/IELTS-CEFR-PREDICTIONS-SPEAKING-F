@@ -1,5 +1,5 @@
 export interface Material {
-  id: number;
+  _id: number;
   name: string;
   level: "beginner" | "intermediate" | "advanced";
 

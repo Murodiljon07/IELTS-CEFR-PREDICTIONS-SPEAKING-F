@@ -54,11 +54,6 @@ export default function RegisterPage() {
       return;
     }
 
-    if (form.password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
-
     setLoading(true);
 
     try {
@@ -68,11 +63,15 @@ export default function RegisterPage() {
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", user);
 
-      if (user.role === "user") {
-        router.push("/");
-      } else if (user.role === "admin") {
-        router.push("/admin");
-      }
+      const redirecTo = async () => {
+        if (user.role === "user") {
+          router.push("/portfolio");
+        } else if (user.role === "admin") {
+          router.push("/admin");
+        }
+      };
+
+      redirecTo();
     } catch (error) {
       console.log(error);
     } finally {

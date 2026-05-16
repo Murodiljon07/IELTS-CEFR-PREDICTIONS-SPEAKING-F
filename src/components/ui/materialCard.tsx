@@ -4,6 +4,8 @@
 import Link from "next/link";
 import { Material } from "@/types/Material.type";
 import { BookOpen, Star, Download } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { materialService } from "@/api/services/materials.service";
 
 // Level colors - type dagi qiymatlarga mos
 const levelColors = {
@@ -27,12 +29,42 @@ const formatCategory = (category: string) => {
 };
 
 function MaterialCard({ material }: { material: Material }) {
-  // MaterialCard da ishlatiladigan qo'shimcha flaglar (agar backenddan kelmasa, logic orqali aniqlaymiz)
+  const router = useRouter();
+
+  // MaterialCard da ishlatiladigan qo'shimcha flaglar ( agar backenddan kelmasa, logic orqali aniqlaymiz)
   const isFree = material.salary === 0;
   const isPopular = material.rate >= 4.5; // 4.8 va undan yuqori bo'lsa popular
   const isNew =
     new Date(material.createdAt) >
     new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // 7 kun ichida yaratilgan bo'lsa
+
+  const handleViewDetails = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        router.push("/auth/login");
+        return;
+      }
+
+      const response = await materialService.getMaterialById(material._id);
+
+      if (response.status === 401) {
+        router.push("/login");
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed");
+      }
+
+      const data = await response.json();
+
+      router.push(`/materials/${material._id}`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all hover:-translate-y-1">
@@ -109,11 +141,12 @@ function MaterialCard({ material }: { material: Material }) {
               </span>
             )}
           </div>
-          <Link href={`/materials/${material.name}`}>
-            <button className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition">
-              View Details
-            </button>
-          </Link>
+          <button
+            onClick={handleViewDetails}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition"
+          >
+            View Details
+          </button>
         </div>
       </div>
     </div>
