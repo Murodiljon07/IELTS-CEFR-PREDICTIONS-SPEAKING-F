@@ -238,16 +238,39 @@ export default function AddMaterialPage() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Rating (0-5) *
             </label>
+
             <input
               type="number"
               step="0.1"
-              min="0"
+              min="0.1"
               max="5"
               value={formData.rate}
+              onFocus={() => {
+                if (formData.rate === 0) {
+                  setFormData({
+                    ...formData,
+                    rate: "" as unknown as number,
+                  });
+                }
+              }}
+              onBlur={() => {
+                if (
+                  formData.rate === ("" as unknown as number) ||
+                  isNaN(formData.rate)
+                ) {
+                  setFormData({
+                    ...formData,
+                    rate: 0.1,
+                  });
+                }
+              }}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  rate: parseFloat(e.target.value) || 0,
+                  rate:
+                    e.target.value === ""
+                      ? ("" as unknown as number)
+                      : parseFloat(e.target.value),
                 })
               }
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -261,21 +284,45 @@ export default function AddMaterialPage() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Price ($) *
             </label>
+
             <input
               type="number"
               step="0.01"
               min="0"
               value={formData.salary}
+              onFocus={() => {
+                if (formData.salary === 0) {
+                  setFormData({
+                    ...formData,
+                    salary: "" as unknown as number,
+                  });
+                }
+              }}
+              onBlur={() => {
+                if (
+                  formData.salary === ("" as unknown as number) ||
+                  isNaN(formData.salary)
+                ) {
+                  setFormData({
+                    ...formData,
+                    salary: 0,
+                  });
+                }
+              }}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  salary: parseFloat(e.target.value) || 0,
+                  salary:
+                    e.target.value === ""
+                      ? ("" as unknown as number)
+                      : parseFloat(e.target.value),
                 })
               }
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               required
               disabled={isLoading}
             />
+
             <p className="text-xs text-gray-500 mt-1">
               Set to 0 for free material
             </p>

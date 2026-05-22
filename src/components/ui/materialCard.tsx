@@ -47,18 +47,19 @@ function MaterialCard({ material }: { material: Material }) {
         return;
       }
 
-      const response = await materialService.getMaterialById(material._id);
+      const response = await materialService.getMaterialById(
+        token,
+        material._id,
+      );
 
       if (response.status === 401) {
         router.push("/login");
         return;
       }
 
-      if (!response.ok) {
-        throw new Error("Failed");
-      }
+      console.log(response.material);
 
-      const data = await response.json();
+      const data = await response.material;
 
       router.push(`/materials/${material._id}`);
     } catch (error) {

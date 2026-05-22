@@ -61,7 +61,7 @@ export function Materials() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {materialsData.map((material, index) => (
             <div
-              key={material.id}
+              key={material._id}
               className={`bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1 ${
                 isVisible
                   ? "opacity-100 translate-y-0"
@@ -121,7 +121,7 @@ export function Materials() {
                 </div>
 
                 {/* Button */}
-                <Link href={`/materials/${material.id}`}>
+                <Link href={`/materials/${material._id}`}>
                   <button className="w-full py-2.5 bg-gray-50 text-gray-700 rounded-lg font-medium text-sm hover:bg-red-600 hover:text-white transition-all">
                     View Details
                   </button>

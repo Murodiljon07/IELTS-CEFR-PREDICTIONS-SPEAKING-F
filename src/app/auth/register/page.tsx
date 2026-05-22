@@ -18,6 +18,7 @@ import {
   Phone,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { formatPhoneAsYouType, isValidPhone } from "@/lib/phone";
 
 type FormData = {
   fullName: string;
@@ -51,6 +52,11 @@ export default function RegisterPage() {
 
     if (form.password !== confirmPassword) {
       setError("Passwords do not match");
+      return;
+    }
+
+    if (form.phone.trim() && !isValidPhone(form.phone)) {
+      setError("Please enter a valid phone number");
       return;
     }
 
@@ -199,7 +205,10 @@ export default function RegisterPage() {
                     className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 bg-gray-50/50 hover:bg-white"
                     value={form.phone}
                     onChange={(e) =>
-                      setForm({ ...form, phone: e.target.value })
+                      setForm({
+                        ...form,
+                        phone: formatPhoneAsYouType(e.target.value),
+                      })
                     }
                     disabled={loading}
                   />

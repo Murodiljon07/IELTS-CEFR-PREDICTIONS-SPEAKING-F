@@ -92,12 +92,6 @@ export default function AdminMaterials() {
     try {
       // Agar backendda delete API bo'lsa
       await materialService.deleteMaterial(token, id);
-
-      // Frontenddan o'chirish
-      setMaterials((prev) =>
-        prev.filter((m) => (m as any)._id !== id && (m as any).id !== id),
-      );
-      setShowDeleteModal(null);
     } catch (error) {
       console.log(error);
     }

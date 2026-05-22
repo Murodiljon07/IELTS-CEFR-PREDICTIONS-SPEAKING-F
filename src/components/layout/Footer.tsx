@@ -3,15 +3,20 @@
 import Link from "next/link";
 import {
   BookOpen,
-  Mail,
-  Phone,
   MapPin,
   Clock,
   Award,
   Shield,
   Send,
+  Users,
 } from "lucide-react";
-import { FaFacebook, FaInstagram, FaYoutube, FaTwitter } from "react-icons/fa";
+import {
+  FaFacebook,
+  FaInstagram,
+  FaYoutube,
+  FaTwitter,
+  FaTelegram,
+} from "react-icons/fa";
 import { useState } from "react";
 
 export function Footer() {
@@ -49,8 +54,9 @@ export function Footer() {
               </div>
             </Link>
             <p className="text-gray-400 text-sm mb-4 leading-relaxed">
-              Master English with our comprehensive learning platform designed
-              for IELTS success. Trusted by 10,000+ students worldwide.
+              Daily real IELTS Speaking, Listening and Reading materials shared
+              by Teacher @umarkhan_band8 to help students achieve higher band
+              scores.
             </p>
             <div className="flex gap-3">
               <a
@@ -116,14 +122,6 @@ export function Footer() {
                   About Us
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/blog"
-                  className="text-gray-400 hover:text-red-500 transition-colors text-sm"
-                >
-                  Blog
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -187,12 +185,39 @@ export function Footer() {
             <h3 className="text-lg font-bold mb-4">Contact Us</h3>
             <ul className="space-y-3 mb-6">
               <li className="flex items-center gap-3 text-gray-400 text-sm">
-                <Mail className="w-4 h-4 text-red-500" />
-                <span>info@goodtesting.uz</span>
+                <Users className="w-4 h-4 text-red-500" />
+                <a
+                  href="https://t.me/ielts_speaking_free"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-blue-300"
+                >
+                  Telegram Channel
+                </a>
               </li>
               <li className="flex items-center gap-3 text-gray-400 text-sm">
-                <Phone className="w-4 h-4 text-red-500" />
-                <span>+998 90 123 45 67</span>
+                <FaTelegram className="w-4 h-4 text-red-500" />
+
+                <a
+                  href="https://t.me/umarkhan_band8"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-blue-300"
+                >
+                  Contact with Telegram
+                </a>
+              </li>
+
+              <li className="flex items-center gap-3 text-gray-400 text-sm">
+                <Shield className="w-4 h-4 text-red-500" />
+                <a
+                  href="https://t.me/umarkhan_band8_admin2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-blue-300"
+                >
+                  @umarkhan_band8_admin2
+                </a>
               </li>
               <li className="flex items-center gap-3 text-gray-400 text-sm">
                 <MapPin className="w-4 h-4 text-red-500" />

@@ -22,98 +22,76 @@ import AboutStats from "@/components/page/about/Stats";
 const teamMembers = [
   {
     id: 1,
-    name: "Dr. Sarah Johnson",
-    role: "Head of Academics",
-    qualification: "PhD in Applied Linguistics",
-    experience: "15+ years",
-    avatar: "👩‍🏫",
-    bio: "Former IELTS examiner with expertise in test preparation",
-  },
-  {
-    id: 2,
-    name: "Prof. Michael Brown",
-    role: "Senior English Instructor",
-    qualification: "MA in TESOL",
-    experience: "12+ years",
+    name: "Umarkhan",
+    role: "IELTS Instructor",
+    qualification: "IELTS Overall Band 8",
+    experience: "IELTS Mentor",
     avatar: "👨‍🏫",
-    bio: "Specializes in grammar and academic writing",
-  },
-  {
-    id: 3,
-    name: "Emma Wilson",
-    role: "IELTS Specialist",
-    qualification: "CELTA Certified",
-    experience: "8+ years",
-    avatar: "👩‍🎓",
-    bio: "Expert in IELTS speaking and listening sections",
-  },
-  {
-    id: 4,
-    name: "Dr. James Lee",
-    role: "Curriculum Director",
-    qualification: "EdD in Curriculum Design",
-    experience: "10+ years",
-    avatar: "👨‍🎓",
-    bio: "Develops comprehensive learning materials",
+    bio: "Reading 9.0 📌 | Listening 8.0 📌",
   },
 ];
 
 // Stats data
 const stats = [
   {
-    value: "50,000+",
-    label: "Students Trained",
-    icon: Users,
+    value: "8.0",
+    label: "IELTS Score",
+    icon: Award,
+    color: "bg-red-500",
+  },
+  {
+    value: "9.0",
+    label: "Reading",
+    icon: BookOpen,
     color: "bg-blue-500",
   },
   {
-    value: "240+",
-    label: "Learning Materials",
-    icon: BookOpen,
+    value: "8.0",
+    label: "Listening",
+    icon: Star,
     color: "bg-green-500",
   },
   {
-    value: "98%",
-    label: "Success Rate",
+    value: "Daily",
+    label: "Real Materials",
     icon: TrendingUp,
     color: "bg-purple-500",
   },
   {
-    value: "4.9/5",
-    label: "Student Rating",
-    icon: Star,
+    value: "@umarkhan_band8",
+    label: "Teacher",
+    icon: Users,
     color: "bg-yellow-500",
   },
   {
-    value: "15+",
-    label: "Expert Instructors",
-    icon: Award,
-    color: "bg-red-500",
+    value: "@umarkhan_band8_admin2",
+    label: "Admin",
+    icon: Shield,
+    color: "bg-indigo-500",
   },
-  { value: "50+", label: "Countries", icon: Globe, color: "bg-indigo-500" },
 ];
 
 // Values
 const values = [
   {
     icon: Heart,
-    title: "Student First",
-    description: "Every decision prioritizes student success",
+    title: "Real Materials",
+    description: "Daily updated IELTS exam materials",
   },
   {
     icon: Shield,
-    title: "Quality Excellence",
-    description: "Highest standards in all materials",
+    title: "Trusted Source",
+    description: "Based on real IELTS experiences",
   },
   {
     icon: Zap,
-    title: "Innovation",
-    description: "Latest educational technology",
+    title: "Daily Updates",
+    description: "Fresh Speaking, Reading & Listening content",
   },
   {
     icon: Globe,
-    title: "Global Access",
-    description: "Quality education worldwide",
+    title: "Global Students",
+    description: "Helping IELTS learners worldwide",
   },
 ];
 
@@ -136,13 +114,13 @@ export default function AboutPage() {
             </span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            Your Journey to{" "}
-            <span className="text-red-500">English Mastery</span>
+            Daily Real <span className="text-red-500">IELTS Materials</span>
           </h1>
+
           <p className="text-gray-300 max-w-2xl mx-auto">
-            GoodTesting is Uzbekistan's premier IELTS Official Test Center,
-            dedicated to helping students achieve their dreams through quality
-            English education.
+            Teacher @umarkhan_band8 shares daily real IELTS Speaking materials,
+            as well as recent IELTS Listening and Reading materials likely to
+            appear in the exam.
           </p>
         </div>
       </section>
@@ -162,23 +140,23 @@ export default function AboutPage() {
                 </span>
               </div>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                From Local Center to{" "}
-                <span className="text-red-600">Global Recognition</span>
+                About <span className="text-red-600">@umarkhan_band8</span>
               </h2>
+
               <p className="text-gray-600 mb-4 leading-relaxed">
-                Founded in 2015, GoodTesting began as a small tutoring center in
-                Tashkent. Through dedication and proven results, we became an
-                Official IELTS Test Center in 2017.
+                This platform belongs to IELTS teacher @umarkhan_band8, who
+                achieved an Overall Band Score of 8 in IELTS.
               </p>
+
               <p className="text-gray-600 mb-4 leading-relaxed">
-                Today, we've helped over 50,000 students worldwide achieve their
-                English learning goals. Our platform offers comprehensive
-                materials, expert instruction, and personalized support.
+                Reading Score: 9.0 📌 <br />
+                Listening Score: 8.0 📌
               </p>
+
               <p className="text-gray-600 leading-relaxed">
-                We're proud to be recognized as one of the leading IELTS
-                preparation centers, with students consistently achieving band
-                scores of 7.5 and above.
+                On this website, you can find daily real IELTS Speaking
+                materials, together with recent IELTS Listening and Reading
+                materials that are likely to appear in the actual exam.
               </p>
             </div>
             <div className="bg-gradient-to-br from-red-50 to-gray-100 rounded-2xl p-8">
@@ -223,9 +201,8 @@ export default function AboutPage() {
                 Our Mission
               </h3>
               <p className="text-gray-600">
-                To provide high-quality, accessible English education that
-                empowers students to achieve their academic and professional
-                goals.
+                To help IELTS students achieve higher band scores through real
+                exam materials and practical learning resources.
               </p>
             </div>
             <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100">
@@ -236,9 +213,8 @@ export default function AboutPage() {
                 Our Vision
               </h3>
               <p className="text-gray-600">
-                To become the most trusted English learning platform,
-                transforming lives through language education and creating
-                global opportunities.
+                To become one of the most trusted IELTS preparation platforms
+                for students worldwide.
               </p>
             </div>
           </div>
@@ -298,10 +274,11 @@ export default function AboutPage() {
               </span>
             </div>
             <h2 className="text-3xl font-bold text-gray-900">
-              Meet Our Instructors
+              Meet Your IELTS Teacher
             </h2>
+
             <p className="text-gray-500 mt-2">
-              Learn from experienced educators
+              Learn with real IELTS experience
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -407,11 +384,12 @@ export default function AboutPage() {
       <section className="py-16 bg-gradient-to-r from-gray-900 to-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Start Your Journey?
+            Start Preparing for IELTS Today
           </h2>
+
           <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
-            Join thousands of successful students who achieved their English
-            goals
+            Access daily real IELTS materials and improve your score with
+            @umarkhan_band8
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/courses">

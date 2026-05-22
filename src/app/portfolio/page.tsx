@@ -40,6 +40,7 @@ export default function PortfolioPage() {
   const [activeTab, setActiveTab] = useState("materials");
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -55,7 +56,7 @@ export default function PortfolioPage() {
 
         setUser(profileData.user);
       } catch (error) {
-        console.error(error);
+        setError("Failed to fetch user profile");
       } finally {
         setLoading(false);
       }
@@ -78,7 +79,8 @@ export default function PortfolioPage() {
   }
 
   if (!user) {
-    return null;
+    localStorage.clear();
+    return router.push("/auth/login");
   }
 
   return (
@@ -142,7 +144,7 @@ export default function PortfolioPage() {
               <TrendingUp className="w-5 h-5 text-blue-600" />
             </div>
 
-            <h2 className="text-lg font-bold">+{user.phone}</h2>
+            <h2 className="text-lg font-bold">{user.phone}</h2>
           </div>
         </div>
 

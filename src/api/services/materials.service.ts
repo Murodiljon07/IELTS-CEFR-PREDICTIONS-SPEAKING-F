@@ -7,8 +7,12 @@ export const materialService = {
     return res.data;
   },
 
-  getMaterialById: async (id: number) => {
-    let res = await api.get(`/materials/${id}`);
+  getMaterialById: async (token: string, id: number) => {
+    let res = await api.get(`/materials/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return res.data;
   },
 
@@ -24,7 +28,7 @@ export const materialService = {
 
   // Agar kerak bo'lsa update va delete uchun ham
   updateMaterial: async (token: string | null, id: string, data: FormData) => {
-    let res = await api.put(`/${id}`, data, {
+    let res = await api.put(`/update-material/${id}`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -33,7 +37,7 @@ export const materialService = {
   },
 
   deleteMaterial: async (token: string | null, id: string) => {
-    let res = await api.delete(`/${id}`, {
+    let res = await api.delete(`/delete-material/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
