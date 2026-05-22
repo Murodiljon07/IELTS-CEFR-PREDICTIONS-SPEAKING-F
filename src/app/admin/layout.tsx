@@ -43,7 +43,7 @@ export default function AdminLayout({
       {/* Mobile Sidebar Toggle */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md"
+        className="lg:hidden fixed top-4 right-4 z-50 p-2 bg-white rounded-lg shadow-md"
       >
         {isSidebarOpen ? (
           <X className="w-5 h-5" />

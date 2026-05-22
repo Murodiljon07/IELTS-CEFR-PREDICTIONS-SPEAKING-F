@@ -61,7 +61,7 @@ function MaterialCard({ material }: { material: Material }) {
 
       const data = await response.material;
 
-      router.push(`/materials/${material._id}`);
+      // router.push(`/materials/${material._id}`);
     } catch (error) {
       console.error(error);
     }

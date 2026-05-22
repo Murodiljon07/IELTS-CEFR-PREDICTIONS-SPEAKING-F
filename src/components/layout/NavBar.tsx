@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BookOpen, Menu, X, User } from "lucide-react";
+import { BookOpen, Menu, X, User, Award, ShoppingCart } from "lucide-react";
 
 const NAV_LINKS = [
   { name: "Home", href: "/" },
@@ -54,9 +54,14 @@ export function Navbar() {
               <div className="w-9 h-9 bg-red-600 rounded-lg flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold text-xl">
-                Good<span className="text-red-600">Testing</span>
-              </span>
+              <div className="flex flex-col">
+                <span className="font-bold text-xl ">
+                  Good<span className="text-red-600">Testing</span>
+                </span>
+                <span className="text-[13px] font-bold flex gap-0">
+                  Muhammadumarkhon <Award className="text-red-500 size-4" />
+                </span>
+              </div>
             </Link>
 
             {/* Desktop Menu */}
@@ -77,21 +82,30 @@ export function Navbar() {
                   </Link>
                 );
               })}
+            </div>
 
+            <div className="flex items-center gap-4">
               {isAuthenticated ? (
                 <div className="flex items-center gap-3">
+                  {/* Cart */}
+                  <Link href="/portfolio/cart">
+                    <button className="relative flex items-center justify-center w-11 h-11 rounded-xl border border-gray-200 hover:border-red-200 hover:bg-red-50 transition-all">
+                      <ShoppingCart className="w-5 h-5 text-gray-700" />
+
+                      {/* Badge */}
+                      <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center font-semibold">
+                        2
+                      </span>
+                    </button>
+                  </Link>
+
+                  {/* Portfolio */}
                   <Link href="/portfolio">
-                    <button className="flex items-center gap-2 px-4 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    <button className="hidden md:flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all shadow-sm">
                       <User className="w-4 h-4" />
                       <span>Portfolio</span>
                     </button>
                   </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="px-4 py-1.5 border border-red-600 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-colors"
-                  >
-                    Logout
-                  </button>
                 </div>
               ) : (
                 <Link href="/auth/login">
@@ -100,12 +114,12 @@ export function Navbar() {
                   </button>
                 </Link>
               )}
-            </div>
 
-            {/* Mobile button */}
-            <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
-              {isOpen ? <X /> : <Menu />}
-            </button>
+              {/* Mobile button */}
+              <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
+                {isOpen ? <X /> : <Menu />}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -131,21 +145,14 @@ export function Navbar() {
             })}
 
             {isAuthenticated ? (
-              <div className="pt-2 space-y-2">
-                <Link href="/portfolio" onClick={() => setIsOpen(false)}>
-                  <button className="w-full px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                    Portfolio
+              <div className="flex items-center gap-3">
+                {/* Portfolio */}
+                <Link href="/portfolio">
+                  <button className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all shadow-sm">
+                    <User className="w-4 h-4" />
+                    <span>Portfolio</span>
                   </button>
                 </Link>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsOpen(false);
-                  }}
-                  className="w-full px-5 py-2 border border-red-600 text-red-600 rounded-lg hover:bg-red-600 hover:text-white"
-                >
-                  Logout
-                </button>
               </div>
             ) : (
               <Link href="/auth/login" onClick={() => setIsOpen(false)}>

@@ -16,63 +16,7 @@ interface Testimonial {
 }
 
 // Testimonial data
-const testimonials: Testimonial[] = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    role: "IELTS Student",
-    content:
-      "GoodTesting helped me achieve a band 8.5 in IELTS! The materials are comprehensive and well-structured. The practice tests were incredibly accurate to the real exam.",
-    rating: 5,
-    avatar: "👩‍🎓",
-    location: "London, UK",
-    score: "Band 8.5",
-  },
-  {
-    id: 2,
-    name: "Ahmed Hassan",
-    role: "University Student",
-    content:
-      "The vocabulary builder is amazing. I improved my English significantly in just 3 months. The flashcards system made learning fun and effective.",
-    rating: 5,
-    avatar: "👨‍🎓",
-    location: "Dubai, UAE",
-    score: "Band 7.5",
-  },
-  {
-    id: 3,
-    name: "Maria Garcia",
-    role: "Professional",
-    content:
-      "Best platform for English learning. The practice tests are exactly like the real IELTS exam. I recommend it to all my colleagues.",
-    rating: 5,
-    avatar: "👩‍💼",
-    location: "Madrid, Spain",
-    score: "Band 8.0",
-  },
-  {
-    id: 4,
-    name: "David Kim",
-    role: "Medical Student",
-    content:
-      "The OET preparation materials were top-notch. I passed my exam on the first try! The instructors are very supportive.",
-    rating: 5,
-    avatar: "👨‍⚕️",
-    location: "Seoul, Korea",
-    score: "350+",
-  },
-  {
-    id: 5,
-    name: "Emma Wilson",
-    role: "English Teacher",
-    content:
-      "As an English teacher, I find the resources here invaluable for my students. The structured approach really works.",
-    rating: 5,
-    avatar: "👩‍🏫",
-    location: "Sydney, Australia",
-    score: "CELTA Certified",
-  },
-];
+const testimonials: Testimonial[] = [];
 
 export function Testimonials() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -134,7 +78,7 @@ export function Testimonials() {
         <div className="relative max-w-4xl mx-auto">
           {/* Main Testimonial Card */}
           <div
-            className={`bg-white rounded-2xl shadow-xl p-6 sm:p-8 transition-all duration-500 ${
+            className={`bg-white rounded-2xl shadow-xl p-6 sm:p-8 transition-all duration-500 min-h-50 ${
               isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
             }`}
           >
@@ -143,59 +87,69 @@ export function Testimonials() {
               <Quote className="w-16 h-16 text-gray-900" />
             </div>
 
-            {/* Rating Stars */}
-            <div className="flex gap-1 mb-4">
-              {[...Array(current.rating)].map((_, i) => (
-                <Star
-                  key={i}
-                  className="w-5 h-5 fill-amber-400 text-amber-400"
-                />
-              ))}
-            </div>
-
-            {/* Content */}
-            <p className="text-gray-700 text-lg leading-relaxed mb-6">
-              "{current.content}"
-            </p>
-
-            {/* Author Info */}
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-red-100 to-red-200 rounded-full flex items-center justify-center text-3xl">
-                  {current.avatar}
+            {current ? (
+              <>
+                {" "}
+                <div className="flex gap-1 mb-4">
+                  {[...Array(current.rating)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className="w-5 h-5 fill-amber-400 text-amber-400"
+                    />
+                  ))}
                 </div>
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h4 className="font-bold text-gray-900 text-lg">
-                      {current.name}
-                    </h4>
-                    {current.score && (
-                      <span className="text-xs font-semibold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">
-                        {current.score}
-                      </span>
-                    )}
+                <p className="text-gray-700 text-lg leading-relaxed mb-6">
+                  "{current.content}"
+                </p>
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 bg-gradient-to-br from-red-100 to-red-200 rounded-full flex items-center justify-center text-3xl">
+                      {current.avatar}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="font-bold text-gray-900 text-lg">
+                          {current.name}
+                        </h4>
+                        {current.score && (
+                          <span className="text-xs font-semibold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">
+                            {current.score}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-500">{current.role}</p>
+                      <p className="text-xs text-gray-400">
+                        {current.location}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-500">{current.role}</p>
-                  <p className="text-xs text-gray-400">{current.location}</p>
                 </div>
-              </div>
-            </div>
+              </>
+            ) : (
+              <h3 className="flex justify-center items-center font-bold text-red-400 text-2xl">
+                Your commet will be hear
+              </h3>
+            )}
           </div>
 
           {/* Navigation Buttons */}
-          <button
-            onClick={prevTestimonial}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-red-600 hover:text-white transition-all"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-
-          <button
-            onClick={nextTestimonial}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-12 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-red-600 hover:text-white transition-all"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+          {current && (
+            <>
+              {" "}
+              <button
+                onClick={prevTestimonial}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-red-600 hover:text-white transition-all"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={nextTestimonial}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-12 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-red-600 hover:text-white transition-all"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </>
+          )}
         </div>
 
         {/* Dots Indicator */}

@@ -17,12 +17,13 @@ import {
   Sparkles,
 } from "lucide-react";
 import AboutStats from "@/components/page/about/Stats";
+import { FaTelegram } from "react-icons/fa";
 
 // Team members
 const teamMembers = [
   {
     id: 1,
-    name: "Umarkhan",
+    name: "Muhammadumarkhan",
     role: "IELTS Instructor",
     qualification: "IELTS Overall Band 8",
     experience: "IELTS Mentor",
@@ -118,9 +119,10 @@ export default function AboutPage() {
           </h1>
 
           <p className="text-gray-300 max-w-2xl mx-auto">
-            Teacher @umarkhan_band8 shares daily real IELTS Speaking materials,
-            as well as recent IELTS Listening and Reading materials likely to
-            appear in the exam.
+            Teacher{" "}
+            <span className="text-red-500 font-bold">Muhammadumarkhan</span>{" "}
+            shares daily real IELTS Speaking materials, as well as recent IELTS
+            Listening and Reading materials likely to appear in the exam.
           </p>
         </div>
       </section>
@@ -140,12 +142,19 @@ export default function AboutPage() {
                 </span>
               </div>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                About <span className="text-red-600">@umarkhan_band8</span>
+                About <span className="text-red-600">Muhammadumarkhan</span>
               </h2>
 
               <p className="text-gray-600 mb-4 leading-relaxed">
-                This platform belongs to IELTS teacher @umarkhan_band8, who
-                achieved an Overall Band Score of 8 in IELTS.
+                This platform belongs to IELTS teacher{" "}
+                <a
+                  href="https://t.me/@umarkhan_band8"
+                  target="_blank"
+                  className="cursor-pointer text-red-500 font-bold"
+                >
+                  Umarkhan
+                </a>
+                , who achieved an Overall Band Score of 8 in IELTS.
               </p>
 
               <p className="text-gray-600 mb-4 leading-relaxed">
@@ -162,15 +171,15 @@ export default function AboutPage() {
             <div className="bg-gradient-to-br from-red-50 to-gray-100 rounded-2xl p-8">
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-white rounded-xl">
-                  <div className="text-2xl font-bold text-red-600">50K+</div>
+                  <div className="text-2xl font-bold text-red-600">15.6K+</div>
                   <div className="text-sm text-gray-500">Students</div>
                 </div>
                 <div className="text-center p-4 bg-white rounded-xl">
-                  <div className="text-2xl font-bold text-red-600">98%</div>
+                  <div className="text-2xl font-bold text-red-600">88%</div>
                   <div className="text-sm text-gray-500">Success Rate</div>
                 </div>
                 <div className="text-center p-4 bg-white rounded-xl">
-                  <div className="text-2xl font-bold text-red-600">9+</div>
+                  <div className="text-2xl font-bold text-red-600">6+</div>
                   <div className="text-sm text-gray-500">Years</div>
                 </div>
                 <div className="text-center p-4 bg-white rounded-xl">

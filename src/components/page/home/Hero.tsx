@@ -63,7 +63,7 @@ export function Hero() {
             {/* Stats */}
             <div className="flex gap-8">
               <div>
-                <div className="text-2xl font-bold text-gray-900">50,000+</div>
+                <div className="text-2xl font-bold text-gray-900">15.6K+</div>
                 <div className="text-sm text-gray-500">Students</div>
               </div>
               <div>
@@ -71,7 +71,7 @@ export function Hero() {
                 <div className="text-sm text-gray-500">Materials</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-gray-900">98%</div>
+                <div className="text-2xl font-bold text-gray-900">88%</div>
                 <div className="text-sm text-gray-500">Success Rate</div>
               </div>
             </div>

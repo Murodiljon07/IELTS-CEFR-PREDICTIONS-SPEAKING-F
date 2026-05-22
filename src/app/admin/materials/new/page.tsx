@@ -58,7 +58,6 @@ export default function AddMaterialPage() {
     e.preventDefault();
 
     if (!token) {
-      setError("Please login first");
       router.push("/auth/login");
       return;
     }
@@ -154,7 +153,7 @@ export default function AddMaterialPage() {
         </div>
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50"
+          className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50 "
           disabled={isLoading}
         >
           <X className="w-4 h-4" />
