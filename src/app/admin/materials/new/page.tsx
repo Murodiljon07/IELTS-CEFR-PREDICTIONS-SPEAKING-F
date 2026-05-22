@@ -17,8 +17,8 @@ interface MaterialFormData {
     | "writing"
     | "speaking";
   level: "beginner" | "intermediate" | "advanced";
-  rate: number;
-  salary: number;
+  rate: number | "";
+  salary: number | "";
   file?: string;
   banner?: string;
 }
@@ -242,35 +242,29 @@ export default function AddMaterialPage() {
             <input
               type="number"
               step="0.1"
-              min="0.1"
+              min="0"
               max="5"
               value={formData.rate}
               onFocus={() => {
                 if (formData.rate === 0) {
                   setFormData({
                     ...formData,
-                    rate: "" as unknown as number,
+                    rate: "",
                   });
                 }
               }}
               onBlur={() => {
-                if (
-                  formData.rate === ("" as unknown as number) ||
-                  isNaN(formData.rate)
-                ) {
+                if (formData.rate === "") {
                   setFormData({
                     ...formData,
-                    rate: 0.1,
+                    rate: 0,
                   });
                 }
               }}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  rate:
-                    e.target.value === ""
-                      ? ("" as unknown as number)
-                      : parseFloat(e.target.value),
+                  rate: e.target.value === "" ? "" : Number(e.target.value),
                 })
               }
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -294,15 +288,12 @@ export default function AddMaterialPage() {
                 if (formData.salary === 0) {
                   setFormData({
                     ...formData,
-                    salary: "" as unknown as number,
+                    salary: "",
                   });
                 }
               }}
               onBlur={() => {
-                if (
-                  formData.salary === ("" as unknown as number) ||
-                  isNaN(formData.salary)
-                ) {
+                if (formData.salary === "") {
                   setFormData({
                     ...formData,
                     salary: 0,
@@ -312,10 +303,7 @@ export default function AddMaterialPage() {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  salary:
-                    e.target.value === ""
-                      ? ("" as unknown as number)
-                      : parseFloat(e.target.value),
+                  salary: e.target.value === "" ? "" : Number(e.target.value),
                 })
               }
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
