@@ -52,7 +52,6 @@ const formatCategory = (category: string) => {
   return map[category.toLowerCase()] || category;
 };
 
-const token = localStorage.getItem("token");
 export default function AdminMaterials() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -60,6 +59,12 @@ export default function AdminMaterials() {
   const [showDeleteModal, setShowDeleteModal] = useState<string | null>(null); // _id uchun string
   const [materials, setMaterials] = useState<Material[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    setToken(storedToken);
+  }, []);
 
   useEffect(() => {
     async function getAllMaterials() {

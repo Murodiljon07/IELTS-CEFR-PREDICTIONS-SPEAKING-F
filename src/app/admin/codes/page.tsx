@@ -51,16 +51,16 @@ export default function GenerateCodesPage() {
   }, []);
 
   const selectedMaterials = availableMaterials.filter((m) =>
-    selectedMaterialIds.includes(Number(m.id)),
+    selectedMaterialIds.includes(Number(m._id)),
   );
   const totalPrice = selectedMaterials.reduce(
     (sum, m) => sum + Number(m.salary),
     0,
   );
 
-  const toggleMaterial = (id: number) => {
+  const toggleMaterial = (_id: number) => {
     setSelectedMaterialIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
+      prev.includes(_id) ? prev.filter((i) => i !== _id) : [...prev, _id],
     );
   };
 
@@ -121,13 +121,13 @@ export default function GenerateCodesPage() {
             <div className="space-y-2 mb-6">
               {availableMaterials.map((material) => (
                 <label
-                  key={Number(material.id)}
+                  key={Number(material._id)}
                   className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
                 >
                   <input
                     type="checkbox"
-                    checked={selectedMaterialIds.includes(Number(material.id))}
-                    onChange={() => toggleMaterial(Number(material.id))}
+                    checked={selectedMaterialIds.includes(Number(material._id))}
+                    onChange={() => toggleMaterial(Number(material._id))}
                     className="w-4 h-4 text-red-600 rounded"
                   />
                   <div className="flex-1">
@@ -153,7 +153,7 @@ export default function GenerateCodesPage() {
                 </p>
                 {selectedMaterials.map((m) => (
                   <div
-                    key={Number(m.id)}
+                    key={Number(m._id)}
                     className="text-sm text-blue-800 flex justify-between"
                   >
                     <span>{m.name}</span>
@@ -260,7 +260,7 @@ export default function GenerateCodesPage() {
                         <span>
                           {availableMaterials
                             .filter((m) =>
-                              item.materialIds.includes(Number(m.id)),
+                              item.materialIds.includes(Number(m._id)),
                             )
                             .map((m) => m.name)
                             .join(", ")}
