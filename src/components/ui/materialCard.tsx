@@ -61,10 +61,15 @@ function MaterialCard({ material }: { material: Material }) {
 
       const data = await response.material;
 
-      // router.push(`/materials/${material._id}`);
+      router.push(`/materials/${data._id}`);
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleAddToCart = () => {
+    // Bu yerda cartga qo'shish logikasini yozamiz (masalan, localStorage yoki global state orqali)
+    alert(`Added ${material.name} to cart!`);
   };
 
   return (
@@ -142,12 +147,21 @@ function MaterialCard({ material }: { material: Material }) {
               </span>
             )}
           </div>
-          <button
-            onClick={handleViewDetails}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition"
-          >
-            View Details
-          </button>
+          {isFree ? (
+            <button
+              onClick={handleViewDetails}
+              className="px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg hover:bg-green-600 transition"
+            >
+              View Details
+            </button>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              className="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition"
+            >
+              Add to Cart
+            </button>
+          )}
         </div>
       </div>
     </div>

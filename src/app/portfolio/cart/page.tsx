@@ -147,61 +147,48 @@ export default function CartPage() {
     }, 1000);
   };
 
-  const sendToTelegramAdmin = () => {
+  const sendToTelegramAdmin = async () => {
     if (pendingItems.length === 0) return;
 
     setIsSendingToTelegram(true);
 
-    const selectedItems = pendingItems.map((item) => ({
-      id: item.id,
-      title: item.title,
-      type: item.type,
-      category: item.category,
-      price: item.price,
-      quantity: item.quantity,
-      total: (item.price * item.quantity).toFixed(2),
-    }));
+    const orderId = "ORDER_" + Date.now();
 
-    const message = {
-      user: {
-        id: "user_" + Date.now(),
-        name: "Demo User",
-        email: "user@example.com",
-      },
-      order: {
-        id: "ORDER_" + Date.now(),
-        date: new Date().toLocaleString(),
-        items: selectedItems,
-        subtotal: subtotal.toFixed(2),
-        discount: discount.toFixed(2),
-        total: total,
-        status: "pending_payment",
-      },
-    };
+    const message = `
+🛒 NEW ORDER
 
-    console.log("📤 Sending to Telegram Admin:", message);
+👤 User: Demo User
+📧 user@example.com
+
+🆔 Order ID: ${orderId}
+
+📦 ITEMS:
+${pendingItems
+  .map(
+    (item, index) => `
+${index + 1}. ${item.title}
+Category: ${item.category}
+Qty: ${item.quantity}
+Price: $${item.price}
+
+Total: $${(item.price * item.quantity).toFixed(2)}
+`,
+  )
+  .join("\n")}
+
+💰 TOTAL: $${total}
+`;
+
+    const telegramUsername = "umarkhan_band8_admin2";
+
+    const telegramUrl = `https://t.me/${telegramUsername}?text=${encodeURIComponent(message)}`;
+
+    window.open(telegramUrl, "_blank");
 
     setTimeout(() => {
-      const generatedCodes = pendingItems.map((item) => ({
-        id: item.id,
-        code: Math.floor(100000 + Math.random() * 900000).toString(),
-      }));
-
-      alert(
-        `✅ Order sent to Telegram Admin!\n\n` +
-          `📦 Order ID: ${message.order.id}\n` +
-          `💰 Total Amount: $${total}\n` +
-          `📦 Items: ${pendingItems.length} items\n\n` +
-          `👨‍💼 Admin will contact you shortly.\n` +
-          `After payment confirmation, you will receive a 6-digit code for each material.\n\n` +
-          `💬 Telegram: @GoodTestingAdmin`,
-      );
-
-      console.log("Generated codes:", generatedCodes);
-
       setIsSendingToTelegram(false);
       setShowPaymentModal(false);
-    }, 2000);
+    }, 1000);
   };
 
   const activatedItems = cartItems.filter((item) => item.isActivated);

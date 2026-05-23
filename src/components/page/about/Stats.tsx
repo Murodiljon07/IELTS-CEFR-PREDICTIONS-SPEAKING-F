@@ -43,7 +43,7 @@ const AboutStats = ({ stats }: AboutStatsProps) => {
                 >
                   <Icon className="w-6 h-6 text-white" />
                 </div>
-                <div className="text-xl font-bold text-gray-900">
+                <div className="text-xl font-bold text-gray-900 break-words whitespace-normal ">
                   {stat.value}
                 </div>
                 <div className="text-xs text-gray-500">{stat.label}</div>

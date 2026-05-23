@@ -24,15 +24,6 @@ export function Footer() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const currentYear = new Date().getFullYear();
 
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setIsSubscribed(true);
-      setEmail("");
-      setTimeout(() => setIsSubscribed(false), 3000);
-    }
-  };
-
   return (
     <footer className="bg-gray-900 text-white pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -199,26 +190,15 @@ export function Footer() {
                 <FaTelegram className="w-4 h-4 text-red-500" />
 
                 <a
-                  href="https://t.me/umarkhan_band8"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-blue-300"
-                >
-                  Contact with Telegram
-                </a>
-              </li>
-
-              <li className="flex items-center gap-3 text-gray-400 text-sm">
-                <Shield className="w-4 h-4 text-red-500" />
-                <a
                   href="https://t.me/umarkhan_band8_admin2"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-blue-300"
                 >
-                  @umarkhan_band8_admin2
+                  Contact with admin
                 </a>
               </li>
+
               <li className="flex items-center gap-3 text-gray-400 text-sm">
                 <MapPin className="w-4 h-4 text-red-500" />
                 <span>Tashkent, Uzbekistan</span>
@@ -228,34 +208,6 @@ export function Footer() {
                 <span>Mon-Fri: 9:00 - 18:00</span>
               </li>
             </ul>
-
-            {/* Newsletter */}
-            <div>
-              <p className="text-sm text-gray-400 mb-3">
-                Subscribe to our newsletter
-              </p>
-              <form onSubmit={handleSubscribe} className="relative">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email address"
-                  className="w-full px-4 py-2.5 pr-12 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder:text-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-red-600 rounded-lg hover:bg-red-700 transition"
-                >
-                  <Send className="w-4 h-4 text-white" />
-                </button>
-              </form>
-              {isSubscribed && (
-                <p className="text-xs text-green-500 mt-2">
-                  ✓ Subscribed successfully!
-                </p>
-              )}
-            </div>
           </div>
         </div>
 

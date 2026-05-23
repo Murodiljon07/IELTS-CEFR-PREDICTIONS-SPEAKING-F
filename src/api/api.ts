@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://ielts-cefr-predictions-speaking.vercel.app/api/v1",
+  baseURL: "http://localhost:8080/api/v1",
 });
 
 // Request interceptor
@@ -27,6 +27,13 @@ api.interceptors.response.use(
   },
   (error) => {
     console.log("RESPONSE ERROR:", error.response);
+
+    if (error.response && error.response.status === 401) {
+      // Handle unauthorized access (e.g., token expired)
+      localStorage.removeItem("token");
+      localStorage.removeItem("user_data");
+      window.location.href = "/auth/login"; // Redirect to login page
+    }
 
     return Promise.reject(error);
   },
