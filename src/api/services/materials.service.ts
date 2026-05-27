@@ -3,44 +3,40 @@ import api from "../api";
 
 export const materialService = {
   getAllMaterials: async () => {
-    let res = await api.get("/materials");
+    const res = await api.get("/materials");
     return res.data;
   },
 
-  getMaterialById: async (token: string, id: number) => {
-    let res = await api.get(`/materials/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  getMaterialById: async (token: string, id: string) => {
+    const res = await api.get(`/materials/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
     });
     return res.data;
   },
 
   createMaterial: async (token: string, data: FormData) => {
-    let res = await api.post("/materials/create-material", data, {
+    const res = await api.post("/materials/create-material", data, {
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
+        // ✅ Content-Type ko'rsatmang — axios FormData ni o'zi aniqlaydi
+        // "Content-Type": "multipart/form-data" ← BU MUAMMO YARATADI
       },
     });
     return res.data;
   },
 
-  // Agar kerak bo'lsa update va delete uchun ham
   updateMaterial: async (token: string | null, id: string, data: FormData) => {
-    let res = await api.put(`/update-material/${id}`, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const res = await api.put(`/materials/update-material/${id}`, data, {
+      // ✅ /materials/ prefix qo'shildi
+      headers: { Authorization: `Bearer ${token}` },
     });
     return res.data;
   },
 
   deleteMaterial: async (token: string | null, id: string) => {
-    let res = await api.delete(`/delete-material/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const res = await api.delete(`/materials/delete-material/${id}`, {
+      // ✅ /materials/ prefix qo'shildi
+      headers: { Authorization: `Bearer ${token}` },
     });
     return res.data;
   },

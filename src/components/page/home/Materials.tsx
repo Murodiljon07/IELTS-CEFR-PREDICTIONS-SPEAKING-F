@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Star, Download, BookOpen, Eye, TrendingUp, Award } from "lucide-react";
 import { materialService } from "@/api/services/materials.service";
 import { Material } from "@/types/Material.type";
+import MaterialCard from "@/components/ui/materialCard";
 
 // Level badge colors
 const levelColors = {
@@ -60,74 +61,7 @@ export function Materials() {
         {/* Materials Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {materialsData.map((material, index) => (
-            <div
-              key={material._id}
-              className={`bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1 ${
-                isVisible
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-10"
-              }`}
-              style={{ transitionDelay: `${index * 100}ms` }}
-            >
-              {/* Image/Preview */}
-              <div className="relative h-40 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-                <BookOpen className="w-12 h-12 text-gray-300" />
-
-                {/* Badges */}
-                {material.salary === 0 && (
-                  <span className="absolute top-3 left-3 px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-lg">
-                    FREE
-                  </span>
-                )}
-                {Number(material.rate) > 4.5 && (
-                  <span className="absolute top-3 right-3 px-2 py-1 bg-amber-500 text-white text-xs font-bold rounded-lg flex items-center gap-1">
-                    <TrendingUp className="w-3 h-3" />
-                    POPULAR
-                  </span>
-                )}
-              </div>
-
-              {/* Content */}
-              <div className="p-5">
-                {/* Level and Category */}
-                <div className="flex items-center justify-between mb-3">
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full ${levelColors[material.level]}`}
-                  >
-                    {material.level}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {material.category}
-                  </span>
-                </div>
-
-                {/* Title */}
-                <h3 className="font-bold text-gray-900 text-lg mb-2 line-clamp-1">
-                  {material.name}
-                </h3>
-
-                {/* Rating and Downloads */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                    <span className="text-sm font-semibold text-gray-900">
-                      {material.rate.toLocaleString()}
-                    </span>
-                    <span className="text-xs text-gray-400">(128 reviews)</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <Download className="w-3.5 h-3.5" />
-                  </div>
-                </div>
-
-                {/* Button */}
-                <Link href={`/materials/${material._id}`}>
-                  <button className="w-full py-2.5 bg-gray-50 text-gray-700 rounded-lg font-medium text-sm hover:bg-red-600 hover:text-white transition-all">
-                    View Details
-                  </button>
-                </Link>
-              </div>
-            </div>
+            <MaterialCard key={index} material={material} />
           ))}
         </div>
 

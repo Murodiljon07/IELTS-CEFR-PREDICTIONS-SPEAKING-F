@@ -1,21 +1,12 @@
 export interface Material {
-  _id: number;
+  _id: string;
   name: string;
-  level: "beginner" | "intermediate" | "advanced";
-
-  category:
-    | "IELTS"
-    | "grammar"
-    | "vocabulary"
-    | "reading"
-    | "listening"
-    | "writing"
-    | "speaking";
-
-  file?: string;
-
-  banner?: string;
+  banner: string;
+  category: string;
   rate: number;
-  salary: number;
+  level: "beginner" | "intermediate" | "advanced";
+  file: string[];
+  price: number;
+  oldPrice: number;
   createdAt: Date;
 }

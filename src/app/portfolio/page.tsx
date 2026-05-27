@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 import {
   User,
@@ -54,7 +55,8 @@ export default function PortfolioPage() {
 
         setUser(profileData.user);
       } catch (error) {
-        console.log(error);
+        router.push("/auth/login");
+        toast.error("Session expired. Please log in again.");
       } finally {
         setLoading(false);
       }
@@ -167,7 +169,8 @@ export default function PortfolioPage() {
                 <p className="text-gray-500 text-sm font-medium">My Cart</p>
 
                 <h2 className="text-4xl font-bold text-gray-900 mt-3">
-                  {user.card?.length || 0}
+                  {JSON.parse(localStorage.getItem("cart") || "[]")?.length ||
+                    0}
                 </h2>
               </div>
 

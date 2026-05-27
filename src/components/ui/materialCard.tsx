@@ -1,10 +1,10 @@
 // components/ui/materialCard.tsx
 "use client";
 
-import Link from "next/link";
 import { Material } from "@/types/Material.type";
 import { BookOpen, Star, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { materialService } from "@/api/services/materials.service";
 
 // Level colors - type dagi qiymatlarga mos
@@ -30,9 +30,10 @@ const formatCategory = (category: string) => {
 
 function MaterialCard({ material }: { material: Material }) {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   // MaterialCard da ishlatiladigan qo'shimcha flaglar ( agar backenddan kelmasa, logic orqali aniqlaymiz)
-  const isFree = material.salary === 0;
+  const isFree = material.price === 0;
   const isPopular = material.rate >= 4.5; // 4.8 va undan yuqori bo'lsa popular
   const isNew =
     new Date(material.createdAt) >
@@ -57,8 +58,6 @@ function MaterialCard({ material }: { material: Material }) {
         return;
       }
 
-      console.log(response.material);
-
       const data = await response.material;
 
       router.push(`/materials/${data._id}`);
@@ -69,7 +68,24 @@ function MaterialCard({ material }: { material: Material }) {
 
   const handleAddToCart = () => {
     // Bu yerda cartga qo'shish logikasini yozamiz (masalan, localStorage yoki global state orqali)
-    alert(`Added ${material.name} to cart!`);
+    setLoading(true);
+
+    if (!localStorage.getItem("token")) {
+      router.push("/auth/login");
+      return;
+    }
+
+    localStorage.setItem(
+      "cart",
+      JSON.stringify([
+        ...(JSON.parse(localStorage.getItem("cart") || "[]") as Material[]),
+        material,
+      ]),
+    );
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
   };
 
   return (
@@ -143,7 +159,7 @@ function MaterialCard({ material }: { material: Material }) {
               <span className="text-lg font-bold text-green-600">Free</span>
             ) : (
               <span className="text-lg font-bold text-gray-900">
-                ${Number(material.salary).toFixed(2)}
+                {Number(material.price).toFixed()} so'm
               </span>
             )}
           </div>
@@ -158,8 +174,9 @@ function MaterialCard({ material }: { material: Material }) {
             <button
               onClick={handleAddToCart}
               className="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition"
+              disabled={loading}
             >
-              Add to Cart
+              {loading ? "Adding..." : "Add to Cart"}
             </button>
           )}
         </div>

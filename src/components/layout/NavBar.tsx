@@ -94,7 +94,8 @@ export function Navbar() {
 
                       {/* Badge */}
                       <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center font-semibold">
-                        2
+                        {JSON.parse(localStorage.getItem("cart") || "[]")
+                          ?.length || 0}
                       </span>
                     </button>
                   </Link>

@@ -60,7 +60,7 @@ export default function AdminMaterials() {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [token, setToken] = useState<string | null>(null);
-
+  const [request, setRequest] = useState<boolean>(false);
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     setToken(storedToken);
@@ -81,8 +81,7 @@ export default function AdminMaterials() {
     }
 
     getAllMaterials();
-  }, []);
-
+  }, [request]);
   const filteredMaterials = materials.filter((m) => {
     const matchesSearch = m.name.toLowerCase().includes(search.toLowerCase());
     const matchesCategory =
@@ -92,11 +91,12 @@ export default function AdminMaterials() {
   });
 
   const handleDelete = async (id: string) => {
-    console.log(id);
-
     try {
       // Agar backendda delete API bo'lsa
       await materialService.deleteMaterial(token, id);
+
+      setShowDeleteModal(null);
+      setRequest(!request);
     } catch (error) {
       console.log(error);
     }
@@ -230,11 +230,11 @@ export default function AdminMaterials() {
                     </span>
                   </td>
                   <td className="p-4">
-                    {Number(material.salary) === 0 ? (
+                    {Number(material.price) === 0 ? (
                       <span className="text-green-600 font-medium">Free</span>
                     ) : (
                       <span className="font-medium text-gray-900">
-                        ${Number(material.salary).toFixed(2)}
+                        ${Number(material.price).toFixed(2)}
                       </span>
                     )}
                   </td>
