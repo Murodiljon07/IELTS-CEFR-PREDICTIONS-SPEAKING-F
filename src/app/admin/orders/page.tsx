@@ -40,7 +40,7 @@ export default function AdminOrders() {
         if (!token) return;
 
         const data = await orderService.getAllOrders(token);
-        console.log(data.orders);
+
         setOrders(data.orders);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
@@ -151,7 +151,7 @@ export default function AdminOrders() {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6 ">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-100">
@@ -179,7 +179,7 @@ export default function AdminOrders() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 overflow-y-auto max-h-[400px]">
               {filteredOrders.map((order) => (
                 <tr key={order._id} className="hover:bg-gray-50 transition">
                   <td className="p-4 text-sm font-medium text-gray-900">

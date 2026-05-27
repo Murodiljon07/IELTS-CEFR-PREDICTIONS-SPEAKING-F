@@ -30,21 +30,21 @@ const orderService = {
   /* ========================================================
      GET MY ORDERS
   ======================================================== */
-  getMyOrders: async (token: string) => {
-    const res = await api.get("/orders/my", {
+  getMyOrders: async (userId: string, token: string) => {
+    const myOrders = await api.get(`/orders/my/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    return res.data;
+    return myOrders.data;
   },
 
   /* ========================================================
      GET ALL ORDERS (ADMIN)
   ======================================================== */
   getAllOrders: async (token: string) => {
-    const res = await api.get("/orders/", {
+    const res = await api.get("/orders", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

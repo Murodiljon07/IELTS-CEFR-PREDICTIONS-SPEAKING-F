@@ -65,16 +65,15 @@ export default function RegisterPage() {
     try {
       let res = await authService.register(form);
 
-      let user = res.data;
-      console.log(user);
+      console.log(res);
 
       localStorage.setItem("token", res.token);
-      localStorage.setItem("user", user);
+      localStorage.setItem("user", JSON.stringify(res.user));
 
       const redirecTo = async () => {
-        if (user.role === "user") {
+        if (res.user.role === "user") {
           router.push("/portfolio");
-        } else if (user.role === "admin") {
+        } else if (res.user.role === "admin") {
           router.push("/admin");
         }
       };

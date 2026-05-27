@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 import userService from "@/api/services/user.service";
+import orderService from "@/api/services/order.service";
 
 const typeIcons = {
   ebook: BookOpen,
@@ -34,6 +35,7 @@ export default function PortfolioPage() {
 
   const [activeTab, setActiveTab] = useState("materials");
   const [user, setUser] = useState<any>(null);
+  const [userOrders, setUserOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -64,6 +66,35 @@ export default function PortfolioPage() {
 
     fetchUserProfile();
   }, [router]);
+
+  useEffect(() => {
+    const fetchUserOrders = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          router.push("/auth/login");
+          return;
+        }
+
+        const ordersData = await orderService.getMyOrders(user._id, token);
+
+        if (ordersData.statusCode === 401) {
+          router.push("/auth/login");
+          return;
+        }
+
+        setUserOrders(ordersData.orders);
+        console.log(ordersData);
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+      }
+    };
+
+    if (user) {
+      fetchUserOrders();
+    }
+  }, [user, router]);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -302,6 +333,17 @@ export default function PortfolioPage() {
               >
                 My Materials
               </button>
+
+              <button
+                onClick={() => setActiveTab("orders")}
+                className={`px-5 py-3 rounded-2xl font-semibold transition ${
+                  activeTab === "orders"
+                    ? "bg-red-600 text-white shadow-lg"
+                    : "bg-white text-gray-700 border border-gray-200"
+                }`}
+              >
+                My Orders
+              </button>
             </div>
 
             {/* MATERIALS */}
@@ -371,6 +413,58 @@ export default function PortfolioPage() {
                       </button>
                     </Link>
                   </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "orders" && (
+              <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  My Orders
+                </h3>
+
+                {userOrders.length > 0 ? (
+                  <div className="space-y-4 flex flex-col-reverse overflow-y-auto max-h-[400px] pr-2">
+                    {userOrders.map((order) => (
+                      <div
+                        key={order._id}
+                        className="flex items-center justify-between p-4 m-2 border border-gray-200 rounded-lg"
+                      >
+                        <div>
+                          {/* Materials nomlarini chiqarish */}
+                          <h4 className="font-bold text-gray-900">
+                            {order.materials && order.materials.length > 0
+                              ? order.materials
+                                  .map((m: { name: string }) => m.name)
+                                  .join(", ")
+                              : "No materials"}
+                          </h4>
+                          <p className="text-gray-500">
+                            Total: $
+                            {order.totalPrice?.toFixed(2) || order.totalPrice}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            Date: {new Date(order.date).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span
+                          className={`text-sm font-medium px-2 py-1 rounded-full ${
+                            order.status === "completed"
+                              ? "bg-green-100 text-green-600"
+                              : order.status === "cancelled"
+                                ? "bg-red-100 text-red-600"
+                                : "bg-yellow-100 text-yellow-600"
+                          }`}
+                        >
+                          {order.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500">
+                    You haven't placed any orders yet.
+                  </p>
                 )}
               </div>
             )}

@@ -24,7 +24,7 @@ export default function LoginPage() {
     email: "",
     password: "",
   });
-  const [error, setError] = useState("");
+  const [error, setError] = useState<any>(null);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError(null);
     setIsLoading(true);
 
     try {
@@ -58,7 +58,7 @@ export default function LoginPage() {
         router.push("/admin");
       }
     } catch (error) {
-      console.log(error);
+      setError("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -318,13 +318,13 @@ export default function LoginPage() {
           <div className="flex items-center gap-2 justify-center mb-1 sm:mb-2">
             <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
             <p className="text-[10px] sm:text-xs font-semibold text-gray-700">
-              Demo Credentials
+              Credentials
             </p>
           </div>
           <div className="flex flex-col xs:flex-row justify-center items-center gap-1 xs:gap-4 text-[10px] sm:text-xs text-gray-500">
             <div className="flex items-center gap-1">
               <Mail className="w-3 h-3" />
-              <span>demo@goodtesting.uz</span>
+              <span>email@gmail.com</span>
             </div>
             <div className="hidden xs:block w-px h-3 bg-gray-300" />
             <div className="flex items-center gap-1">

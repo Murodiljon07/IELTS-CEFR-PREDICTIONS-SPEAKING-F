@@ -54,7 +54,7 @@ export default function AddMaterialPage() {
     }
 
     // ✅ Majburiy fieldlarni tekshirish
-    if (!formData.price || Number(formData.price) <= 0) {
+    if (Number(formData.price) < 0) {
       setError("Narxni kiriting");
       return;
     }
@@ -256,7 +256,6 @@ export default function AddMaterialPage() {
                 })
               }
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              required
               disabled={isLoading}
             />
             <p className="text-xs text-gray-500 mt-1">Bepul bo'lsa 0 qiling</p>

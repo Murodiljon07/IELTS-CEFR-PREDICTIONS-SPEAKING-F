@@ -234,7 +234,7 @@ export default function AdminMaterials() {
                       <span className="text-green-600 font-medium">Free</span>
                     ) : (
                       <span className="font-medium text-gray-900">
-                        ${Number(material.price).toFixed(2)}
+                        {Number(material.price).toFixed(2)} uzs
                       </span>
                     )}
                   </td>
