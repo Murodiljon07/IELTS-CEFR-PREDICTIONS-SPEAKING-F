@@ -2,12 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Image from "next/image";
 
 import { Material } from "@/types/Material.type";
 import { materialService } from "@/api/services/materials.service";
+import api from "@/api/api";
 
-import { Star, Download, ArrowLeft, BookOpen, BadgeCheck } from "lucide-react";
+import {
+  Star,
+  ArrowLeft,
+  BookOpen,
+  BadgeCheck,
+  Loader2,
+  Eye,
+  ShoppingCart,
+} from "lucide-react";
 
 const levelColors = {
   beginner: "bg-green-100 text-green-700",
@@ -25,8 +33,18 @@ const formatCategory = (category: string) => {
     writing: "Writing",
     speaking: "Speaking",
   };
-
   return map[category.toLowerCase()] || category;
+};
+
+const getFullUrl = (path: string | undefined) => {
+  if (!path) return null;
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+
+  const baseURL =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+  const baseWithoutApi = baseURL.replace("/api/v1", "");
+  const cleanPath = path.replace(/^\/+/, "");
+  return `${baseWithoutApi}/${cleanPath}`;
 };
 
 export default function MaterialDetailsPage() {
@@ -35,6 +53,10 @@ export default function MaterialDetailsPage() {
 
   const [material, setMaterial] = useState<Material | null>(null);
   const [loading, setLoading] = useState(true);
+  const [opening, setOpening] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
+  const [hasAccess, setHasAccess] = useState(false);
 
   useEffect(() => {
     async function fetchMaterial() {
@@ -51,9 +73,41 @@ export default function MaterialDetailsPage() {
           String(params.id),
         );
 
-        setMaterial(response.material);
-      } catch (error) {
-        console.log(error);
+        console.log("API response:", response);
+
+        let materialData = null;
+
+        if (response?.data) {
+          materialData = response.data;
+        } else if (response) {
+          materialData = response;
+        }
+
+        if (materialData) {
+          setMaterial(materialData);
+
+          // ✅ Access ni tekshirish:
+          // 1. Agar material free bo'lsa -> true
+          // 2. Agar materialda hasAccess fieldi bo'lsa -> o'sha qiymat
+          // 3. Aks holda -> false
+          const access =
+            materialData.price === 0 || materialData.hasAccess === true;
+          setHasAccess(access);
+        } else {
+          setError("Material not found");
+        }
+      } catch (error: any) {
+        console.error("Error fetching material:", error);
+        if (error.response?.status === 401) {
+          localStorage.removeItem("token");
+          router.push("/auth/login");
+        } else if (error.response?.status === 403) {
+          setError(
+            "You don't have access to this material. Please purchase it first.",
+          );
+        } else {
+          setError(error.response?.data?.message || "Failed to load material");
+        }
       } finally {
         setLoading(false);
       }
@@ -61,6 +115,39 @@ export default function MaterialDetailsPage() {
 
     fetchMaterial();
   }, [params.id, router]);
+
+  // ✅ Materialni ochish
+  // ✅ Materialni brauzerda ochish (eng oddiy usul)
+  const openMaterial = () => {
+    if (!material?._id) {
+      alert("Material ID topilmadi");
+      return;
+    }
+
+    // Access tekshiruvi
+    if (!hasAccess) {
+      alert("Bu materialga ruxsatingiz yo'q. Iltimos, materialni sotib oling!");
+      return;
+    }
+
+    if (!material.file) {
+      alert("Fayl mavjud emas");
+      return;
+    }
+
+    try {
+      // To'g'ridan-to'g'ri fayl URL ini brauzerda ochish
+      window.open(material.file, "_blank");
+    } catch (error: any) {
+      console.error("Open material error:", error);
+      alert(error.message || "Materialni ochishda xatolik");
+    }
+  };
+
+  // ✅ Sotib olish sahifasiga o'tish
+  const goToCheckout = () => {
+    router.push(`/checkout?material=${material?._id}`);
+  };
 
   if (loading) {
     return (
@@ -70,20 +157,52 @@ export default function MaterialDetailsPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <div className="bg-white rounded-2xl p-8 text-center max-w-md">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <BookOpen className="w-10 h-10 text-red-500" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Access Denied
+          </h1>
+          <p className="text-gray-500 mb-6">{error}</p>
+          <button
+            onClick={() => router.push("/materials")}
+            className="px-6 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700"
+          >
+            Browse Materials
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!material) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <h1 className="text-2xl font-bold">Material not found</h1>
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Material not found
+          </h1>
+          <button
+            onClick={() => router.push("/materials")}
+            className="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg"
+          >
+            Back to Materials
+          </button>
+        </div>
       </div>
     );
   }
 
   const isFree = material.price === 0;
+  const bannerUrl = getFullUrl(material.banner);
 
   return (
     <div className="min-h-screen bg-gray-50 py-10">
       <div className="max-w-6xl mx-auto px-4">
-        {/* Back Button */}
         <button
           onClick={() => router.back()}
           className="flex items-center gap-2 mb-6 text-gray-600 hover:text-red-600 transition"
@@ -94,95 +213,80 @@ export default function MaterialDetailsPage() {
 
         <div className="bg-white rounded-2xl overflow-hidden shadow-lg">
           {/* Banner */}
-          <div className="relative h-[300px] w-full bg-gray-100">
-            {material.banner ? (
-              <Image
-                src={material.banner}
+          <div className="relative h-[300px] w-full bg-gradient-to-r from-red-500 to-red-600">
+            {bannerUrl && !imageError ? (
+              <img
+                src={bannerUrl}
                 alt={material.name}
-                fill
-                className="object-cover"
+                className="w-full h-full object-cover"
+                onError={() => setImageError(true)}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <BookOpen className="w-20 h-20 text-gray-300" />
+                <BookOpen className="w-20 h-20 text-white/50" />
               </div>
             )}
           </div>
 
           {/* Content */}
           <div className="p-8">
-            {/* Top */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
               <div>
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-3 mb-3 flex-wrap">
                   <span
                     className={`px-3 py-1 rounded-full text-sm font-medium ${levelColors[material.level]}`}
                   >
-                    {material.level}
+                    {material.level.charAt(0).toUpperCase() +
+                      material.level.slice(1)}
                   </span>
-
                   <span className="bg-gray-100 px-3 py-1 rounded-full text-sm">
                     {formatCategory(material.category)}
                   </span>
-
                   {isFree && (
                     <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                       FREE
                     </span>
                   )}
                 </div>
-
                 <h1 className="text-3xl font-bold text-gray-900">
                   {material.name}
                 </h1>
               </div>
 
-              <div className="flex items-center gap-6">
+              {material.rate > 0 && (
                 <div className="flex items-center gap-2">
                   <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                   <span className="font-semibold">
                     {material.rate.toFixed(1)}
                   </span>
                 </div>
-
-                <div className="flex items-center gap-2 text-gray-500">
-                  <Download className="w-5 h-5" />
-                  <span>
-                    {Math.floor(Math.random() * 5000).toLocaleString()}
-                  </span>
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* Description */}
             <div className="border-t pt-6">
               <h2 className="text-xl font-bold mb-4">Material Information</h2>
-
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 rounded-xl p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <BadgeCheck className="w-5 h-5 text-red-500" />
                     <h3 className="font-semibold">Category</h3>
                   </div>
-
                   <p className="text-gray-600">
                     {formatCategory(material.category)}
                   </p>
                 </div>
-
                 <div className="bg-gray-50 rounded-xl p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <BadgeCheck className="w-5 h-5 text-red-500" />
                     <h3 className="font-semibold">Level</h3>
                   </div>
-
                   <p className="text-gray-600 capitalize">{material.level}</p>
                 </div>
               </div>
             </div>
 
-            {/* Price + Download */}
             <div className="mt-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-t pt-6">
+              {/* Price */}
               <div>
                 {isFree ? (
                   <span className="text-3xl font-bold text-green-600">
@@ -190,21 +294,60 @@ export default function MaterialDetailsPage() {
                   </span>
                 ) : (
                   <span className="text-3xl font-bold text-gray-900">
-                    ${material.price.toFixed(2)}
+                    {material.price.toLocaleString()} so'm
                   </span>
                 )}
               </div>
 
+              {/* Actions */}
               {material.file && (
-                <a
-                  href={""}
-                  target="_blank"
-                  className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition"
-                >
-                  Download Material
-                </a>
+                <>
+                  {hasAccess ? (
+                    // ✅ Agar access bo'lsa -> Open tugmasi
+                    <button
+                      onClick={openMaterial}
+                      disabled={opening}
+                      className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                      {opening ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                      {opening ? "Opening..." : "Open Material"}
+                    </button>
+                  ) : (
+                    // ✅ Agar access bo'lmasa -> Purchase tugmasi
+                    <button
+                      onClick={goToCheckout}
+                      className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition flex items-center gap-2"
+                    >
+                      <ShoppingCart className="w-5 h-5" />
+                      Purchase to Access
+                    </button>
+                  )}
+                </>
               )}
             </div>
+
+            {/* Access status message */}
+            {!isFree && !hasAccess && (
+              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-700">
+                  ⚠️ You don't have access to this material. Please purchase it
+                  to unlock.
+                </p>
+              </div>
+            )}
+
+            {hasAccess && (
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-700">
+                  ✅ You have full access to this material. Click "Open
+                  Material" to start learning.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

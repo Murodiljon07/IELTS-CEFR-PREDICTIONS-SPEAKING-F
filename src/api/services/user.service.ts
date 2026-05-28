@@ -1,7 +1,8 @@
+// api/services/user.service.ts
 import api from "../api";
 
 const userService = {
-  getUserProfile: async (token: string) => {
+  getUserPortfolio: async (token: string) => {
     try {
       const res = await api.get("/user/portfolio", {
         headers: {
@@ -9,9 +10,11 @@ const userService = {
         },
       });
 
-      return res.data;
+      // Backend returns { success: true, data: { profile, stats, orders, materials } }
+      return res.data.data;
     } catch (error: any) {
-      throw error.response?.data || error;
+      console.error("Get user portfolio error:", error);
+      throw error;
     }
   },
 };

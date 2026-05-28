@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Save, X, Upload, Loader2 } from "lucide-react";
+import { Save, X, Upload, Loader2, Trash2 } from "lucide-react";
 import { materialService } from "@/api/services/materials.service";
 
 interface MaterialFormData {
@@ -17,8 +17,8 @@ interface MaterialFormData {
     | "speaking";
   level: "beginner" | "intermediate" | "advanced";
   rate: number | "";
-  price: number | ""; // ✅ salary → price
-  oldPrice: number | ""; // ✅ oldPrice qo'shildi
+  price: number;
+  oldPrice: number | "";
 }
 
 export default function AddMaterialPage() {
@@ -26,6 +26,7 @@ export default function AddMaterialPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [isFree, setIsFree] = useState(false);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -38,8 +39,8 @@ export default function AddMaterialPage() {
     category: "IELTS",
     level: "beginner",
     rate: "",
-    price: "", // ✅
-    oldPrice: "", // ✅
+    price: 0,
+    oldPrice: "",
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -48,14 +49,20 @@ export default function AddMaterialPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!token) {
       router.push("/auth/login");
       return;
     }
 
-    // ✅ Majburiy fieldlarni tekshirish
-    if (Number(formData.price) < 0) {
-      setError("Narxni kiriting");
+    if (!formData.name.trim()) {
+      setError("Material nomini kiriting");
+      return;
+    }
+
+    // ✅ Free material uchun file majburiy emas
+    if (!isFree && !selectedFile) {
+      setError("Material faylini yuklang (free bo'lmagan material uchun)");
       return;
     }
 
@@ -64,18 +71,17 @@ export default function AddMaterialPage() {
 
     try {
       const submitData = new FormData();
-      submitData.append("name", formData.name);
+      submitData.append("name", formData.name.trim());
       submitData.append("category", formData.category);
       submitData.append("level", formData.level);
+      submitData.append("price", isFree ? "0" : formData.price.toString());
 
-      if (formData.rate !== "") {
+      if (formData.rate !== "" && formData.rate !== null) {
         submitData.append("rate", formData.rate.toString());
       }
 
-      submitData.append("price", formData.price.toString()); // ✅ price
-
-      if (formData.oldPrice !== "") {
-        submitData.append("oldPrice", formData.oldPrice.toString()); // ✅ oldPrice
+      if (formData.oldPrice !== "" && formData.oldPrice !== null) {
+        submitData.append("oldPrice", formData.oldPrice.toString());
       }
 
       if (selectedFile) {
@@ -86,14 +92,21 @@ export default function AddMaterialPage() {
         submitData.append("banner", selectedBanner);
       }
 
-      await materialService.createMaterial(token, submitData);
+      console.log("Submitting material:");
+      for (let pair of submitData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
 
+      await materialService.createMaterial(token, submitData);
       router.push("/admin/materials");
     } catch (err: any) {
+      console.error("Create error:", err);
+      console.error("Response:", err.response?.data);
+
       if (err.response?.status === 401) {
         setError("Sessiya tugagan. Qayta kiring.");
         localStorage.removeItem("token");
-        router.push("/admin/login");
+        router.push("/auth/login");
       } else if (err.response?.status === 403) {
         setError("Ruxsat yo'q. Admin huquqi talab etiladi.");
       } else {
@@ -125,22 +138,21 @@ export default function AddMaterialPage() {
     if (type === "file") {
       setSelectedFile(file);
     } else {
-      setSelectedBanner(file);
-      // ✅ Preview URL — avvalgisini tozalash
       if (bannerPreview) URL.revokeObjectURL(bannerPreview);
+      setSelectedBanner(file);
       setBannerPreview(URL.createObjectURL(file));
     }
   };
 
-  const categoryOptions = [
-    { value: "IELTS", label: "IELTS" },
-    { value: "grammar", label: "Grammar" },
-    { value: "vocabulary", label: "Vocabulary" },
-    { value: "reading", label: "Reading" },
-    { value: "listening", label: "Listening" },
-    { value: "writing", label: "Writing" },
-    { value: "speaking", label: "Speaking" },
-  ];
+  const removeFile = () => {
+    setSelectedFile(null);
+  };
+
+  const removeBanner = () => {
+    if (bannerPreview) URL.revokeObjectURL(bannerPreview);
+    setSelectedBanner(null);
+    setBannerPreview(null);
+  };
 
   return (
     <div>
@@ -172,7 +184,7 @@ export default function AddMaterialPage() {
         className="bg-white rounded-xl p-6 shadow-sm border border-gray-100"
       >
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Nom */}
+          {/* Name */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Material nomi *
@@ -190,7 +202,7 @@ export default function AddMaterialPage() {
             />
           </div>
 
-          {/* Kategoriya */}
+          {/* Category */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Kategoriya *
@@ -204,15 +216,17 @@ export default function AddMaterialPage() {
               required
               disabled={isLoading}
             >
-              {categoryOptions.map((cat) => (
-                <option key={cat.value} value={cat.value}>
-                  {cat.label}
-                </option>
-              ))}
+              <option value="IELTS">IELTS</option>
+              <option value="grammar">Grammar</option>
+              <option value="vocabulary">Vocabulary</option>
+              <option value="reading">Reading</option>
+              <option value="listening">Listening</option>
+              <option value="writing">Writing</option>
+              <option value="speaking">Speaking</option>
             </select>
           </div>
 
-          {/* Daraja */}
+          {/* Level */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Daraja *
@@ -232,68 +246,78 @@ export default function AddMaterialPage() {
             </select>
           </div>
 
-          {/* Narx */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Narx (so'm) *
+          {/* Free Material Checkbox */}
+          <div className="md:col-span-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isFree}
+                onChange={(e) => {
+                  setIsFree(e.target.checked);
+                  if (e.target.checked) {
+                    setFormData({ ...formData, price: 0 });
+                  }
+                }}
+                className="w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+              />
+              <span className="text-sm font-medium text-gray-700">
+                Bepul material
+              </span>
             </label>
-            <input
-              type="number"
-              min="0"
-              value={formData.price}
-              onFocus={() => {
-                if (formData.price === 0)
-                  setFormData({ ...formData, price: "" });
-              }}
-              onBlur={() => {
-                if (formData.price === "")
-                  setFormData({ ...formData, price: 0 });
-              }}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  price: e.target.value === "" ? "" : Number(e.target.value),
-                })
-              }
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              disabled={isLoading}
-            />
-            <p className="text-xs text-gray-500 mt-1">Bepul bo'lsa 0 qiling</p>
-          </div>
-
-          {/* Eski narx */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Eski narx (ixtiyoriy)
-            </label>
-            <input
-              type="number"
-              min="0"
-              value={formData.oldPrice}
-              placeholder="Chegirma ko'rsatish uchun"
-              onFocus={() => {
-                if (formData.oldPrice === 0)
-                  setFormData({ ...formData, oldPrice: "" });
-              }}
-              onBlur={() => {
-                if (formData.oldPrice === "")
-                  setFormData({ ...formData, oldPrice: "" });
-              }}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  oldPrice: e.target.value === "" ? "" : Number(e.target.value),
-                })
-              }
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              disabled={isLoading}
-            />
             <p className="text-xs text-gray-500 mt-1">
-              Chegirma ko'rsatish uchun eski narxni kiriting
+              Bepul materiallarni hamma ko'ra oladi va fayl yuklash shart emas
             </p>
           </div>
 
-          {/* Reyting */}
+          {/* Price - faqat free bo'lmaganda */}
+          {!isFree && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Narx (so'm) *
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="1000"
+                value={formData.price}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    price: Number(e.target.value) || 0,
+                  })
+                }
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                required={!isFree}
+                disabled={isLoading}
+              />
+            </div>
+          )}
+
+          {/* Old Price */}
+          {!isFree && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Eski narx (ixtiyoriy)
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="1000"
+                value={formData.oldPrice}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    oldPrice:
+                      e.target.value === "" ? "" : Number(e.target.value),
+                  })
+                }
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                disabled={isLoading}
+              />
+            </div>
+          )}
+
+          {/* Rating */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Reyting (0–5, ixtiyoriy)
@@ -304,14 +328,6 @@ export default function AddMaterialPage() {
               min="0"
               max="5"
               value={formData.rate}
-              placeholder="0.0"
-              onFocus={() => {
-                if (formData.rate === 0) setFormData({ ...formData, rate: "" });
-              }}
-              onBlur={() => {
-                if (formData.rate === "")
-                  setFormData({ ...formData, rate: "" });
-              }}
               onChange={(e) =>
                 setFormData({
                   ...formData,
@@ -323,10 +339,11 @@ export default function AddMaterialPage() {
             />
           </div>
 
-          {/* Material fayli */}
+          {/* File Upload - free bo'lmaganda majburiy */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Material fayli
+              Material fayli{" "}
+              {!isFree && <span className="text-red-500">*</span>}
             </label>
             <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-red-300 transition">
               <input
@@ -334,7 +351,7 @@ export default function AddMaterialPage() {
                 id="file-upload"
                 className="hidden"
                 onChange={(e) => handleFileChange(e, "file")}
-                accept=".pdf,.epub,.mp4,.mp3,.docx"
+                accept=".pdf,.epub,.mp4,.mp3,.docx,.txt,.jpg,.png,.html,.zip"
                 disabled={isLoading}
               />
               <label htmlFor="file-upload" className="cursor-pointer block">
@@ -349,63 +366,28 @@ export default function AddMaterialPage() {
                   )}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  PDF, EPUB, MP4, MP3, DOCX (max 100MB)
+                  PDF, EPUB, MP4, MP3, DOCX, TXT, Rasmlar (max 100MB)
                 </p>
               </label>
             </div>
-          </div>
-
-          {/* Banner */}
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Banner rasmi
-            </label>
-            <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-red-300 transition">
-              <input
-                type="file"
-                id="banner-upload"
-                className="hidden"
-                onChange={(e) => handleFileChange(e, "banner")}
-                accept="image/*"
-                disabled={isLoading}
-              />
-              <label htmlFor="banner-upload" className="cursor-pointer block">
-                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">
-                  {selectedBanner ? (
-                    <span className="text-green-600 font-medium">
-                      ✓ {selectedBanner.name}
-                    </span>
-                  ) : (
-                    "Rasmni tanlang yoki bu yerga tashlang"
-                  )}
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  JPG, PNG, WEBP (max 5MB)
-                </p>
-              </label>
-            </div>
-
-            {/* ✅ Banner preview */}
-            {bannerPreview && (
-              <div className="mt-3 relative inline-block">
-                <img
-                  src={bannerPreview}
-                  alt="Banner preview"
-                  className="h-32 w-auto rounded-lg border border-gray-200 object-cover"
-                />
+            {selectedFile && (
+              <div className="mt-2 flex items-center gap-2 text-sm">
+                <span className="text-green-600">
+                  Fayl tanlandi: {selectedFile.name}
+                </span>
                 <button
                   type="button"
-                  onClick={() => {
-                    setSelectedBanner(null);
-                    if (bannerPreview) URL.revokeObjectURL(bannerPreview);
-                    setBannerPreview(null);
-                  }}
-                  className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+                  onClick={removeFile}
+                  className="text-red-500 hover:text-red-700"
                 >
-                  ✕
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
+            )}
+            {isFree && !selectedFile && (
+              <p className="text-xs text-gray-400 mt-1">
+                Bepul material uchun fayl yuklash shart emas
+              </p>
             )}
           </div>
         </div>

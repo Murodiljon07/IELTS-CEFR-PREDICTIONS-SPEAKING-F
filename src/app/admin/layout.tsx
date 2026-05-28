@@ -21,7 +21,6 @@ const adminLinks = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Materials", href: "/admin/materials", icon: BookOpen },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
-  { name: "Generate Codes", href: "/admin/codes", icon: Key },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 

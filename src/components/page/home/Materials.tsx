@@ -24,7 +24,7 @@ export function Materials() {
       try {
         setIsLoading(true);
         let data = await materialService.getAllMaterials();
-        setMaterialsData(data.materials);
+        setMaterialsData(data);
       } catch (error) {
         console.log(error);
       } finally {

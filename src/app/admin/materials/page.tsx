@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Plus,
@@ -8,16 +8,12 @@ import {
   Trash2,
   Eye,
   Search,
-  Filter,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-
-import { useEffect } from "react";
 import { Material } from "@/types/Material.type";
 import { materialService } from "@/api/services/materials.service";
 
-// Categories - Material type dagi category larga mos
 const categories = [
   "All",
   "IELTS",
@@ -31,14 +27,12 @@ const categories = [
 
 const levels = ["All", "beginner", "intermediate", "advanced"];
 
-// Level colors - type dagi qiymatlarga mos
 const levelColors = {
   beginner: "bg-green-100 text-green-700",
   intermediate: "bg-blue-100 text-blue-700",
   advanced: "bg-red-100 text-red-700",
 };
 
-// Category ni formatlash
 const formatCategory = (category: string) => {
   const map: Record<string, string> = {
     ielts: "IELTS",
@@ -56,11 +50,12 @@ export default function AdminMaterials() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedLevel, setSelectedLevel] = useState("All");
-  const [showDeleteModal, setShowDeleteModal] = useState<string | null>(null); // _id uchun string
+  const [showDeleteModal, setShowDeleteModal] = useState<string | null>(null);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [token, setToken] = useState<string | null>(null);
-  const [request, setRequest] = useState<boolean>(false);
+  const [refresh, setRefresh] = useState<boolean>(false);
+
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     setToken(storedToken);
@@ -70,18 +65,27 @@ export default function AdminMaterials() {
     async function getAllMaterials() {
       try {
         setIsLoading(true);
-        let data = await materialService.getAllMaterials();
-        // Backenddan kelgan ma'lumotlar strukturasi tekshirish
-        setMaterials(data.materials || data);
+        // ✅ materialService allaqachon array qaytaradi
+        const materialsArray = await materialService.getAllMaterials();
+
+        // ✅ materialsArray array ekanligini tekshir
+        if (Array.isArray(materialsArray)) {
+          setMaterials(materialsArray);
+        } else {
+          console.error("Expected array but got:", materialsArray);
+          setMaterials([]);
+        }
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching materials:", error);
+        setMaterials([]);
       } finally {
         setIsLoading(false);
       }
     }
 
     getAllMaterials();
-  }, [request]);
+  }, [refresh]);
+
   const filteredMaterials = materials.filter((m) => {
     const matchesSearch = m.name.toLowerCase().includes(search.toLowerCase());
     const matchesCategory =
@@ -91,18 +95,20 @@ export default function AdminMaterials() {
   });
 
   const handleDelete = async (id: string) => {
-    try {
-      // Agar backendda delete API bo'lsa
-      await materialService.deleteMaterial(token, id);
+    if (!token) {
+      console.error("No token found");
+      return;
+    }
 
+    try {
+      await materialService.deleteMaterial(token, id);
       setShowDeleteModal(null);
-      setRequest(!request);
+      setRefresh(!refresh); // ✅ Ro'yxatni yangilash
     } catch (error) {
-      console.log(error);
+      console.error("Delete error:", error);
     }
   };
 
-  // Material ID ni olish (MongoDB _id yoki oddiy id)
   const getMaterialId = (material: Material): string => {
     return (material as any)._id;
   };
@@ -234,7 +240,7 @@ export default function AdminMaterials() {
                       <span className="text-green-600 font-medium">Free</span>
                     ) : (
                       <span className="font-medium text-gray-900">
-                        {Number(material.price).toFixed(2)} uzs
+                        {Number(material.price).toLocaleString()} UZS
                       </span>
                     )}
                   </td>
@@ -242,7 +248,7 @@ export default function AdminMaterials() {
                     <div className="flex items-center gap-1">
                       <span className="text-amber-500">★</span>
                       <span className="text-sm font-medium text-gray-900">
-                        {Number(material.rate).toFixed(1)}
+                        {Number(material.rate || 0).toFixed(1)}
                       </span>
                     </div>
                   </td>

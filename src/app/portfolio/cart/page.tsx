@@ -21,36 +21,44 @@ export default function CartPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // ✅ TO'G'RI - user ma'lumotlarini olish
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       try {
         const userData = JSON.parse(storedUser);
         setUser(userData);
-        console.log("User ma'lumotlari:", userData);
       } catch (error) {
         console.error("User parse qilishda xatolik:", error);
       }
     } else {
       router.push("/auth/login");
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const stored = localStorage.getItem("cart");
     if (stored) {
-      setCartItems(JSON.parse(stored));
+      const items = JSON.parse(stored);
+      // ✅ Price ni Number ga o'girish
+      const normalizedItems = items.map((item: any) => ({
+        ...item,
+        price: Number(item.price),
+        oldPrice: item.oldPrice ? Number(item.oldPrice) : undefined,
+      }));
+      setCartItems(normalizedItems);
     }
   }, []);
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
-  const discount = cartItems.reduce((sum, item) => {
-    if (item.oldPrice && item.oldPrice > item.price) {
-      return sum + (item.oldPrice - item.price);
-    }
-    return sum;
-  }, 0);
-  const total = subtotal - discount;
+  // ✅ Chegirma hisoblash - to'g'rilangan
+  const total = cartItems.reduce((sum, item) => sum + item.price, 0);
+
+  const subTotal = cartItems.reduce(
+    (sum, item) => sum + (item.oldPrice || item.price),
+    0,
+  );
+
+  const discount = subTotal > total ? subTotal - total : 0;
+
+  const increase = total > subTotal ? total - subTotal : 0;
 
   const removeItem = (id: string) => {
     const updated = cartItems.filter((item) => item._id !== id);
@@ -58,10 +66,12 @@ export default function CartPage() {
     localStorage.setItem("cart", JSON.stringify(updated));
   };
 
-  const handleOrder = async () => {
-    console.log("📝 Cart items:", cartItems);
-    console.log("📝 User:", user);
+  // ✅ Material IDs ni olish
+  const getMaterialIds = () => {
+    return cartItems.map((item) => item._id);
+  };
 
+  const handleOrder = async () => {
     if (cartItems.length === 0) {
       alert("Savatingiz bo'sh!");
       return;
@@ -85,18 +95,13 @@ export default function CartPage() {
       }
 
       // 1️⃣ ORDERNI BACKENDGA SAQLASH
+      const materialIds = getMaterialIds();
       const response = await orderService.createOrder(
         user._id,
-        cartItems.map((item) => item._id),
+        materialIds,
         total,
         token,
       );
-
-      console.log("Order response:", response);
-
-      if (!response) {
-        throw new Error("Order saqlashda xatolik");
-      }
 
       // 2️⃣ TELEGRAM MESSAGE TAYYORLASH
       const materialsList = cartItems
@@ -104,34 +109,78 @@ export default function CartPage() {
           (item, i) =>
             `${i + 1}. ${item.name}
    Kategoriya: ${item.category || "Yo'q"}
-   Narx: ${item.price.toLocaleString()} so'm`,
+   Daraja: ${item.level || "Yo'q"}
+   Narx: ${item.price.toLocaleString()} so'm${item.oldPrice && item.oldPrice > item.price ? ` (Chegirma: ${(item.oldPrice - item.price).toLocaleString()} so'm)` : ""}`,
         )
         .join("\n\n");
 
       const orderId =
-        response.order?._id || response._id || "ORD-" + Date.now();
+        response?.order?._id || response?._id || `ORD-${Date.now()}`;
+
+      // ✅ User telefon raqamini tekshirish
+      const userPhone =
+        user.phone || user.phoneNumber || "Telefon ko'rsatilmagan";
+      const userFullName = user.fullName || user.name || "Ism ko'rsatilmagan";
+      const userEmail = user.email || "Email ko'rsatilmagan";
 
       const message =
-        `🛒 YANGI BUYURTMA #${orderId.slice(-6)}\n\n` +
-        `👤 ${user.fullName || user.name || "Ism ko'rsatilmagan"}\n` +
-        `📞 ${user.phone || "Telefon ko'rsatilmagan"}\n` +
-        `📧 ${user.email || "Email ko'rsatilmagan"}\n\n` +
+        `🛒 YANGI BUYURTMA 🆔${orderId.slice(-6)}\n\n` +
+        `👤 ${userFullName}\n` +
+        `📞 ${userPhone}\n` +
+        `📧 ${userEmail}\n\n` +
         `📦 BUYURTMA MAHSULOTLARI:\n${materialsList}\n\n` +
-        `💰 JAMI: ${total.toLocaleString()} so'm\n\n` +
+        `💰 ASL NARX: ${subTotal.toLocaleString()} so'm\n` +
+        (discount > 0
+          ? `🏷 CHEGIRMA: -${discount.toLocaleString()} so'm\n`
+          : increase > 0
+            ? `📈 QO'SHIMCHA: +${increase.toLocaleString()} so'm\n`
+            : "") +
+        `💵 JAMI TO'LOV: ${total.toLocaleString()} so'm\n\n` +
         `⏱ Vaqt: ${new Date().toLocaleString()}`;
 
-      console.log("📨 Message:", message);
-
       // 3️⃣ TELEGRAMGA YUBORISH
-      const telegramUrl = `https://t.me/umarkhan_band8_admin2?text=${encodeURIComponent(message)}`;
-      window.open(telegramUrl, "_blank");
+      const botToken = process.env.NEXT_PUBLIC_TELEGRAM_BOT_TOKEN;
+      const chatId = process.env.NEXT_PUBLIC_TELEGRAM_CHAT_ID;
+
+      // ✅ Agar bot token bo'lsa, API orqali yuborish
+      if (botToken && chatId) {
+        try {
+          const telegramApiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+          const telegramResponse = await fetch(telegramApiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: message,
+              parse_mode: "HTML",
+            }),
+          });
+
+          if (telegramResponse.ok) {
+            console.log("Telegram message sent via API");
+          } else {
+            // Fallback: link ochish
+            const telegramUrl = `https://t.me/umarkhan_band8_admin2?text=${encodeURIComponent(message)}`;
+            window.open(telegramUrl, "_blank");
+          }
+        } catch (error) {
+          console.error("Telegram API error:", error);
+          // Fallback: link ochish
+          const telegramUrl = `https://t.me/umarkhan_band8_admin2?text=${encodeURIComponent(message)}`;
+          window.open(telegramUrl, "_blank");
+        }
+      } else {
+        // Link orqali yuborish
+        const telegramUrl = `https://t.me/umarkhan_band8_admin2?text=${encodeURIComponent(message)}`;
+        window.open(telegramUrl, "_blank");
+      }
 
       // 4️⃣ CARTNI TOZALASH
       localStorage.removeItem("cart");
       setCartItems([]);
       setShowConfirmModal(false);
 
-      alert("Buyurtma muvaffaqiyatli yuborildi!");
+      router.push("/portfolio");
     } catch (error: any) {
       console.error("Xatolik:", error);
       alert("Xatolik yuz berdi: " + (error.message || "Qayta urinib ko'ring"));
@@ -232,14 +281,14 @@ export default function CartPage() {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Umumiy narx</span>
-                  <span>{subtotal.toLocaleString()} so'm</span>
+                  <span>{total.toLocaleString()} so'm</span>
                 </div>
-                {discount > 0 && (
+                {/* {discount &&  > 0 && (
                   <div className="flex justify-between text-red-600">
                     <span>Chegirma</span>
                     <span>-{discount.toLocaleString()} so'm</span>
                   </div>
-                )}
+                )} */}
                 <div className="border-t pt-3 mt-3">
                   <div className="flex justify-between font-bold text-lg">
                     <span>Jami to'lov</span>
@@ -279,7 +328,7 @@ export default function CartPage() {
           onClick={() => setShowConfirmModal(false)}
         >
           <div
-            className="relative max-w-md w-full bg-white rounded-2xl shadow-2xl"
+            className="relative max-w-md w-full bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6">
@@ -323,6 +372,17 @@ export default function CartPage() {
                     <span>{item.price.toLocaleString()} so'm</span>
                   </div>
                 ))}
+                {increase > 0 ? (
+                  <div className="border-t border-gray-200 mt-2 pt-2 flex justify-between text-xs text-green-600">
+                    <span>Qo'shimcha:</span>
+                    <span>+{increase.toLocaleString()} so'm</span>
+                  </div>
+                ) : discount > 0 ? (
+                  <div className="border-t border-gray-200 mt-2 pt-2 flex justify-between text-xs text-red-600">
+                    <span>Chegirma:</span>
+                    <span>-{discount.toLocaleString()} so'm</span>
+                  </div>
+                ) : null}
                 <div className="border-t border-gray-200 mt-2 pt-2 flex justify-between font-semibold text-sm">
                   <span>Jami:</span>
                   <span className="text-green-600">

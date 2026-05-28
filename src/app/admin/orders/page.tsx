@@ -41,7 +41,7 @@ export default function AdminOrders() {
 
         const data = await orderService.getAllOrders(token);
 
-        setOrders(data.orders);
+        setOrders(data);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
       }
@@ -83,6 +83,8 @@ export default function AdminOrders() {
     try {
       const token = localStorage.getItem("token");
       if (!token) return;
+
+      console.log(id, status);
 
       // Call API to update status
       if (status === "completed") {
