@@ -36,14 +36,19 @@ const formatCategory = (category: string) => {
   return map[category.toLowerCase()] || category;
 };
 
-const getFullUrl = (path: string | undefined) => {
+const getFullUrl = (path?: string | null) => {
   if (!path) return null;
-  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
 
   const baseURL =
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+
   const baseWithoutApi = baseURL.replace("/api/v1", "");
   const cleanPath = path.replace(/^\/+/, "");
+
   return `${baseWithoutApi}/${cleanPath}`;
 };
 
@@ -135,9 +140,11 @@ export default function MaterialDetailsPage() {
       return;
     }
 
+    const fileUrl = getFullUrl(material.file?.[0]);
+
     try {
       // To'g'ridan-to'g'ri fayl URL ini brauzerda ochish
-      window.open(material.file, "_blank");
+      window.open(fileUrl || undefined, "_blank");
     } catch (error: any) {
       console.error("Open material error:", error);
       alert(error.message || "Materialni ochishda xatolik");
