@@ -78,7 +78,7 @@ export default function MaterialsPage() {
   }, []);
 
   // Filter materials - type ga mos
-  const filteredMaterials = materialsData.filter((material) => {
+  const filteredMaterials = materialsData?.filter((material) => {
     const matchesSearch = material.name
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -99,8 +99,8 @@ export default function MaterialsPage() {
   });
 
   // Pagination
-  const totalPages = Math.ceil(filteredMaterials.length / ITEMS_PER_PAGE);
-  const paginatedMaterials = filteredMaterials.slice(
+  const totalPages = Math.ceil(filteredMaterials?.length / ITEMS_PER_PAGE);
+  const paginatedMaterials = filteredMaterials?.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
@@ -260,8 +260,8 @@ export default function MaterialsPage() {
           {/* Results Count */}
           <div className="flex justify-between items-center mb-6">
             <p className="text-sm text-gray-500">
-              Showing {paginatedMaterials.length} of {filteredMaterials.length}{" "}
-              materials
+              Showing {paginatedMaterials?.length} of{" "}
+              {filteredMaterials?.length} materials
             </p>
           </div>
 
@@ -271,7 +271,7 @@ export default function MaterialsPage() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
               <p className="text-gray-500">Loading materials...</p>
             </div>
-          ) : filteredMaterials.length === 0 ? (
+          ) : filteredMaterials?.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-xl">
               <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -289,7 +289,7 @@ export default function MaterialsPage() {
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {paginatedMaterials.map((material, index) => (
+              {paginatedMaterials?.map((material, index) => (
                 <MaterialCard key={index} material={material} />
               ))}
             </div>

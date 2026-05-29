@@ -24,6 +24,7 @@ export function Materials() {
       try {
         setIsLoading(true);
         let data = await materialService.getAllMaterials();
+
         setMaterialsData(data);
       } catch (error) {
         console.log(error);
@@ -60,9 +61,10 @@ export function Materials() {
 
         {/* Materials Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {materialsData.map((material, index) => (
-            <MaterialCard key={index} material={material} />
-          ))}
+          {materialsData &&
+            materialsData.map((material, index) => (
+              <MaterialCard key={index} material={material} />
+            ))}
         </div>
 
         {/* View All Button */}

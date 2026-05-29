@@ -41,16 +41,18 @@ export default function LoginPage() {
 
       let user = res.user;
 
-      localStorage.setItem("token", res.token);
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          _id: user._id,
-          email: user.email,
-          fullName: user.fullName,
-          phone: user.phone,
-        }),
-      );
+      if (user) {
+        localStorage.setItem("token", res.token);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            _id: user._id,
+            email: user.email,
+            fullName: user.fullName,
+            phone: user.phone,
+          }),
+        );
+      }
 
       if (user.role === "user") {
         router.push("/portfolio");

@@ -65,8 +65,6 @@ export default function RegisterPage() {
     try {
       let res = await authService.register(form);
 
-      console.log(res);
-
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", JSON.stringify(res.user));
 
