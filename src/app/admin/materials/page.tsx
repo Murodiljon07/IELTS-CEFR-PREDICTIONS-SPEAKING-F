@@ -27,7 +27,7 @@ const categories = [
 
 const levels = ["All", "beginner", "intermediate", "advanced"];
 
-const levelColors = {
+const levelColors: Record<string, string> = {
   beginner: "bg-green-100 text-green-700",
   intermediate: "bg-blue-100 text-blue-700",
   advanced: "bg-red-100 text-red-700",
@@ -65,16 +65,10 @@ export default function AdminMaterials() {
     async function getAllMaterials() {
       try {
         setIsLoading(true);
-        // ✅ materialService allaqachon array qaytaradi
-        const materialsArray = await materialService.getAllMaterials();
 
-        // ✅ materialsArray array ekanligini tekshir
-        if (Array.isArray(materialsArray)) {
-          setMaterials(materialsArray);
-        } else {
-          console.error("Expected array but got:", materialsArray);
-          setMaterials([]);
-        }
+        const res = await materialService.getAllMaterials();
+
+        setMaterials(Array.isArray(res) ? res : []);
       } catch (error) {
         console.error("Error fetching materials:", error);
         setMaterials([]);
@@ -214,13 +208,17 @@ export default function AdminMaterials() {
                   <td className="p-4 text-sm text-gray-600">{index + 1}</td>
                   <td className="p-4">
                     <div>
-                      <p className="font-medium text-gray-900">
-                        {material.name}
-                      </p>
                       {material.file && (
-                        <p className="text-xs text-gray-500 mt-1 truncate max-w-[200px]">
-                          {material.file}
-                        </p>
+                        <div className="text-xs text-gray-500 mt-1">
+                          <p>{material.name}</p>
+                          <p>
+                            {(material.file.size
+                              ? material.file.size / 1024 / 1024
+                              : 0
+                            ).toFixed(2)}{" "}
+                            MB
+                          </p>
+                        </div>
                       )}
                     </div>
                   </td>
@@ -229,7 +227,7 @@ export default function AdminMaterials() {
                   </td>
                   <td className="p-4">
                     <span
-                      className={`text-xs px-2 py-1 rounded-full ${levelColors[material.level]}`}
+                      className={`text-xs px-2 py-1 rounded-full ${levelColors[material.level] || "bg-gray-200 text-gray-800"}`}
                     >
                       {material.level.charAt(0).toUpperCase() +
                         material.level.slice(1)}

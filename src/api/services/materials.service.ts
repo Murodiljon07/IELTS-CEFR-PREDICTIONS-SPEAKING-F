@@ -1,33 +1,37 @@
-// api/services/materials.service.ts
 import api from "../api";
 
 export const materialService = {
   getAllMaterials: async () => {
     const res = await api.get("/materials");
-    // Backend: { success, count, data }
-    return res.data.data; // ✅ To'g'ridan-to'g'ri materials arrayini qaytar
+
+    // backend: { success, count, data }
+    return res.data.data; // 👈 ALWAYS array
   },
 
   getMaterialById: async (token: string, id: string) => {
     const res = await api.get(`/materials/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return res.data.data; // ✅ material object
+
+    // backend: { success, data: {...} }
+    return res.data.data;
   },
 
   createMaterial: async (token: string, data: FormData) => {
+    console.log(data);
+
     const res = await api.post("/materials", data, {
-      // ✅ URL to'g'ri
       headers: { Authorization: `Bearer ${token}` },
     });
+
     return res.data.data;
   },
 
   updateMaterial: async (token: string, id: string, data: FormData) => {
     const res = await api.put(`/materials/${id}`, data, {
-      // ✅ URL to'g'ri
       headers: { Authorization: `Bearer ${token}` },
     });
+
     return res.data.data;
   },
 
@@ -35,6 +39,7 @@ export const materialService = {
     const res = await api.delete(`/materials/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return res.data.data;
+
+    return res.data.success; // ❗ delete uchun data emas success yaxshi
   },
 };

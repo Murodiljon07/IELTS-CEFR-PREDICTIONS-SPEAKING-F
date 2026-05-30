@@ -1,12 +1,14 @@
 export interface Material {
   _id: string;
   name: string;
-  banner: string;
   category: string;
-  rate: number;
   level: "beginner" | "intermediate" | "advanced";
-  file: string[];
   price: number;
-  oldPrice: number;
-  createdAt: Date;
+  rate: number;
+  createdAt: string;
+  file?: {
+    fileName?: string;
+    contentType?: string;
+    size?: number;
+  } | null;
 }

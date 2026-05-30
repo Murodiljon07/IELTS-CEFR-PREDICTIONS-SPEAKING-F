@@ -36,20 +36,6 @@ const formatCategory = (category: string) => {
   return map[category.toLowerCase()] || category;
 };
 
-const getFullUrl = (path?: string | null) => {
-  if (!path) return null;
-
-  if (path.startsWith("http://") || path.startsWith("https://")) {
-    return path;
-  }
-
-  const baseURL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
-  const baseWithoutApi = baseURL.replace("/api/v1", "");
-  const cleanPath = path.replace(/^\/+/, "");
-  return `${baseWithoutApi}/${cleanPath}`;
-};
-
 export default function MaterialDetailsPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -75,8 +61,6 @@ export default function MaterialDetailsPage() {
           token,
           String(params.id),
         );
-
-        console.log("API response:", response);
 
         let materialData = null;
 
@@ -121,29 +105,31 @@ export default function MaterialDetailsPage() {
 
   // ✅ Materialni ochish
   // ✅ Materialni brauzerda ochish (eng oddiy usul)
-  const openMaterial = () => {
-    if (!material?._id) {
-      alert("Material ID topilmadi");
-      return;
-    }
-
-    // Access tekshiruvi
-    if (!hasAccess) {
-      alert("Bu materialga ruxsatingiz yo'q. Iltimos, materialni sotib oling!");
-      return;
-    }
-
-    if (!material.file) {
-      alert("Fayl mavjud emas");
-      return;
-    }
-
+  const openMaterial = async () => {
     try {
-      // To'g'ridan-to'g'ri fayl URL ini brauzerda ochish
-      window.open(getFullUrl(material.file?.[0]) || undefined, "_blank");
-    } catch (error: any) {
-      console.error("Open material error:", error);
-      alert(error.message || "Materialni ochishda xatolik");
+      setOpening(true);
+
+      const token = localStorage.getItem("token");
+
+      const response = await api.get(`/materials/${material?._id}/content`, {
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const blobUrl = URL.createObjectURL(response.data);
+
+      window.open(blobUrl, "_blank");
+
+      setTimeout(() => {
+        URL.revokeObjectURL(blobUrl);
+      }, 1000);
+    } catch (err) {
+      console.error(err);
+      alert("Faylni ochib bo'lmadi");
+    } finally {
+      setOpening(false);
     }
   };
 
@@ -201,7 +187,6 @@ export default function MaterialDetailsPage() {
   }
 
   const isFree = material.price === 0;
-  const bannerUrl = getFullUrl(material.banner);
 
   return (
     <div className="min-h-screen bg-gray-50 py-10">
@@ -217,18 +202,9 @@ export default function MaterialDetailsPage() {
         <div className="bg-white rounded-2xl overflow-hidden shadow-lg">
           {/* Banner */}
           <div className="relative h-[300px] w-full bg-gradient-to-r from-red-500 to-red-600">
-            {bannerUrl && !imageError ? (
-              <img
-                src={bannerUrl}
-                alt={material.name}
-                className="w-full h-full object-cover"
-                onError={() => setImageError(true)}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <BookOpen className="w-20 h-20 text-white/50" />
-              </div>
-            )}
+            <div className="w-full h-full flex items-center justify-center">
+              <BookOpen className="w-20 h-20 text-white/50" />
+            </div>
           </div>
 
           {/* Content */}

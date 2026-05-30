@@ -111,15 +111,7 @@ function MaterialCard({ material }: { material: Material }) {
     <div className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all hover:-translate-y-1">
       {/* Image/Banner */}
       <div className="relative h-40 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-        {material.banner ? (
-          <img
-            src={material.banner as string}
-            alt={material.name as string}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <BookOpen className="w-12 h-12 text-gray-300" />
-        )}
+        <BookOpen className="w-12 h-12 text-gray-300" />
 
         {isFree && (
           <span className="absolute top-3 left-3 px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-lg">

@@ -84,8 +84,6 @@ export default function AdminOrders() {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      console.log(id, status);
-
       // Call API to update status
       if (status === "completed") {
         await orderService.approveOrder(id, token);

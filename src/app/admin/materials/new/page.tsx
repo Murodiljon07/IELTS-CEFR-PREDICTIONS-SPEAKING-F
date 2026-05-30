@@ -17,7 +17,7 @@ interface MaterialFormData {
     | "speaking";
   level: "beginner" | "intermediate" | "advanced";
   rate: number | "";
-  price: number;
+  price: number | "";
   oldPrice: number | "";
 }
 
@@ -27,6 +27,8 @@ export default function AddMaterialPage() {
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isFree, setIsFree] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -44,8 +46,6 @@ export default function AddMaterialPage() {
   });
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [selectedBanner, setSelectedBanner] = useState<File | null>(null);
-  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,16 +88,12 @@ export default function AddMaterialPage() {
         submitData.append("file", selectedFile);
       }
 
-      if (selectedBanner) {
-        submitData.append("banner", selectedBanner);
-      }
-
-      console.log("Submitting material:");
       for (let pair of submitData.entries()) {
         console.log(pair[0], pair[1]);
       }
 
       await materialService.createMaterial(token, submitData);
+
       router.push("/admin/materials");
     } catch (err: any) {
       console.error("Create error:", err);
@@ -105,7 +101,7 @@ export default function AddMaterialPage() {
 
       if (err.response?.status === 401) {
         setError("Sessiya tugagan. Qayta kiring.");
-        localStorage.removeItem("token");
+        localStorage.clear();
         router.push("/auth/login");
       } else if (err.response?.status === 403) {
         setError("Ruxsat yo'q. Admin huquqi talab etiladi.");
@@ -119,39 +115,23 @@ export default function AddMaterialPage() {
 
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: "file" | "banner",
+    type: "file",
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setError(null);
 
-    if (type === "file" && file.size > 100 * 1024 * 1024) {
-      setError("Fayl 100MB dan kichik bo'lishi kerak");
-      return;
-    }
-    if (type === "banner" && file.size > 5 * 1024 * 1024) {
-      setError("Banner 5MB dan kichik bo'lishi kerak");
+    if (type === "file" && file.size > 5 * 1024 * 1024) {
+      setError("Fayl 5MB dan kichik bo'lishi kerak");
       return;
     }
 
-    if (type === "file") {
-      setSelectedFile(file);
-    } else {
-      if (bannerPreview) URL.revokeObjectURL(bannerPreview);
-      setSelectedBanner(file);
-      setBannerPreview(URL.createObjectURL(file));
-    }
+    setSelectedFile(file);
   };
 
   const removeFile = () => {
     setSelectedFile(null);
-  };
-
-  const removeBanner = () => {
-    if (bannerPreview) URL.revokeObjectURL(bannerPreview);
-    setSelectedBanner(null);
-    setBannerPreview(null);
   };
 
   return (
@@ -283,7 +263,7 @@ export default function AddMaterialPage() {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    price: Number(e.target.value) || 0,
+                    price: Number(e.target.value) || "",
                   })
                 }
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -366,7 +346,7 @@ export default function AddMaterialPage() {
                   )}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  PDF, EPUB, MP4, MP3, DOCX, TXT, Rasmlar (max 100MB)
+                  html, PDF, EPUB, MP4, MP3, DOCX, TXT, Rasmlar (max 5MB)
                 </p>
               </label>
             </div>

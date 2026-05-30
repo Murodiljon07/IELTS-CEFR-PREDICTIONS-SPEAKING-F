@@ -16,7 +16,6 @@ export default function AdminSettings() {
   });
 
   const handleSave = () => {
-    console.log("Saving settings:", settings);
     alert("Settings saved successfully!");
   };
 

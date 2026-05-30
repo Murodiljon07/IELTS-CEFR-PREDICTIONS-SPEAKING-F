@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import api from "@/api/api";
 
 import {
   User,
@@ -30,8 +31,10 @@ interface Material {
   category: string;
   level: string;
   price: number;
-  file?: string;
-  banner?: string;
+  file?: {
+    fileName?: string;
+    contentType?: string;
+  };
 }
 
 interface Order {
@@ -63,7 +66,7 @@ interface PortfolioData {
 
 export default function PortfolioPage() {
   const router = useRouter();
-
+  const [opening, setOpening] = useState(false);
   const [activeTab, setActiveTab] = useState("materials");
   const [portfolio, setPortfolio] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -79,7 +82,7 @@ export default function PortfolioPage() {
         }
 
         const portfolioData = await userService.getUserPortfolio(token);
-        console.log("Portfolio data:", portfolioData);
+
         setPortfolio(portfolioData);
       } catch (error: any) {
         console.error("Error fetching portfolio:", error);
@@ -97,18 +100,33 @@ export default function PortfolioPage() {
   }, [router]);
 
   // ✅ Materialni brauzerda ochish (juda sodda)
-  const openMaterial = (material: Material) => {
-    if (!material.file) {
-      toast.error("Fayl mavjud emas");
-      return;
+  const handleOpenMaterial = async (materialId: string) => {
+    setOpening(true);
+    if (!materialId) return;
+
+    try {
+      setOpening(true);
+
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        router.push("/auth/login");
+        return;
+      }
+
+      const response = await api.get(`/materials/${materialId}/content`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: "blob", // Faylni blob sifatida olish
+      });
+
+      window.open(URL.createObjectURL(response.data), "_blank");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setOpening(false);
     }
-
-    console.log("Opening:", material.name);
-    console.log("File URL:", material.file);
-
-    // To'g'ridan-to'g'ri brauzerda ochish
-    window.open(material.file, "_blank");
-    toast.success("Material ochilmoqda...");
   };
 
   const handleLogout = () => {
@@ -140,12 +158,17 @@ export default function PortfolioPage() {
   }
 
   // Fayl turiga qarab icon
-  const getFileIcon = (filePath?: string) => {
-    if (!filePath) return BookOpen;
-    const ext = filePath.split(".").pop()?.toLowerCase();
+  const getFileIcon = (file?: any) => {
+    const fileName = file?.fileName;
+
+    if (!fileName) return BookOpen;
+
+    const ext = fileName.split(".").pop()?.toLowerCase();
+
     if (ext === "pdf") return BookOpen;
-    if (ext === "mp4" || ext === "mov") return Video;
-    if (ext === "mp3" || ext === "wav") return Headphones;
+    if (ext === "mp4") return Video;
+    if (ext === "mp3") return Headphones;
+
     return BookOpen;
   };
 
@@ -389,11 +412,17 @@ export default function PortfolioPage() {
 
                           {/* ✅ Oddiy Open tugmasi */}
                           <button
-                            onClick={() => openMaterial(material)}
+                            onClick={() => handleOpenMaterial(material._id)}
                             className="bg-red-600 hover:bg-red-700 transition text-white px-6 py-3 rounded-2xl font-semibold flex items-center gap-2 shadow-lg"
                           >
-                            <Eye className="w-5 h-5" />
-                            Open Material
+                            {opening ? (
+                              "Opening..."
+                            ) : (
+                              <>
+                                <Eye className="w-5 h-5" />
+                                Open material
+                              </>
+                            )}
                           </button>
                         </div>
                       </div>

@@ -66,6 +66,7 @@ export default function MaterialsPage() {
       try {
         setIsLoading(true);
         let data = await materialService.getAllMaterials();
+
         setMaterialsData(data);
       } catch (error) {
         console.log(error);

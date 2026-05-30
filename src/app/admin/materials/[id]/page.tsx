@@ -36,22 +36,6 @@ const formatCategory = (category: string) => {
   return map[category.toLowerCase()] || category;
 };
 
-const getFullUrl = (path?: string | null) => {
-  if (!path) return null;
-
-  if (path.startsWith("http://") || path.startsWith("https://")) {
-    return path;
-  }
-
-  const baseURL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
-
-  const baseWithoutApi = baseURL.replace("/api/v1", "");
-  const cleanPath = path.replace(/^\/+/, "");
-
-  return `${baseWithoutApi}/${cleanPath}`;
-};
-
 export default function MaterialDetailsPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -77,8 +61,6 @@ export default function MaterialDetailsPage() {
           token,
           String(params.id),
         );
-
-        console.log("API response:", response);
 
         let materialData = null;
 
@@ -123,31 +105,31 @@ export default function MaterialDetailsPage() {
 
   // ✅ Materialni ochish
   // ✅ Materialni brauzerda ochish (eng oddiy usul)
-  const openMaterial = () => {
-    if (!material?._id) {
-      alert("Material ID topilmadi");
-      return;
-    }
-
-    // Access tekshiruvi
-    if (!hasAccess) {
-      alert("Bu materialga ruxsatingiz yo'q. Iltimos, materialni sotib oling!");
-      return;
-    }
-
-    if (!material.file) {
-      alert("Fayl mavjud emas");
-      return;
-    }
-
-    const fileUrl = getFullUrl(material.file?.[0]);
+  const handleOpenMaterial = async (materialId: string) => {
+    if (!materialId) return;
 
     try {
-      // To'g'ridan-to'g'ri fayl URL ini brauzerda ochish
-      window.open(fileUrl || undefined, "_blank");
-    } catch (error: any) {
-      console.error("Open material error:", error);
-      alert(error.message || "Materialni ochishda xatolik");
+      setOpening(true);
+
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        router.push("/auth/login");
+        return;
+      }
+
+      const response = await api.get(`/materials/${materialId}/content`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: "blob", // Faylni blob sifatida olish
+      });
+
+      window.open(URL.createObjectURL(response.data), "_blank");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setOpening(false);
     }
   };
 
@@ -205,7 +187,6 @@ export default function MaterialDetailsPage() {
   }
 
   const isFree = material.price === 0;
-  const bannerUrl = getFullUrl(material.banner);
 
   return (
     <div className="min-h-screen bg-gray-50 py-10">
@@ -221,18 +202,9 @@ export default function MaterialDetailsPage() {
         <div className="bg-white rounded-2xl overflow-hidden shadow-lg">
           {/* Banner */}
           <div className="relative h-[300px] w-full bg-gradient-to-r from-red-500 to-red-600">
-            {bannerUrl && !imageError ? (
-              <img
-                src={bannerUrl}
-                alt={material.name}
-                className="w-full h-full object-cover"
-                onError={() => setImageError(true)}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <BookOpen className="w-20 h-20 text-white/50" />
-              </div>
-            )}
+            <div className="w-full h-full flex items-center justify-center">
+              <BookOpen className="w-20 h-20 text-white/50" />
+            </div>
           </div>
 
           {/* Content */}
@@ -312,7 +284,7 @@ export default function MaterialDetailsPage() {
                   {hasAccess ? (
                     // ✅ Agar access bo'lsa -> Open tugmasi
                     <button
-                      onClick={openMaterial}
+                      onClick={() => handleOpenMaterial(material._id)}
                       disabled={opening}
                       className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
