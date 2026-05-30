@@ -3,14 +3,12 @@ import axios from "axios";
 const BASE_URL = process.env.BASE_URL;
 
 const api = axios.create({
-  baseURL: BASE_URL, // ✅ To'g'ri URL
+  baseURL: BASE_URL,
 });
 
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    // console.log("REQUEST:", config);
-
     return config;
   },
   (error) => {
