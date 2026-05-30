@@ -3,7 +3,7 @@ import axios from "axios";
 const BASE_URL = process.env.BASE_URL;
 
 const api = axios.create({
-  baseURL: "http://localhost:8080/api/v1", // ✅ To'g'ri URL
+  baseURL: BASE_URL, // ✅ To'g'ri URL
 });
 
 // Request interceptor
